@@ -16,41 +16,41 @@ PARSE_LEXICA:
 
     Number  Tag     Description
     1.      CC      Coordinating conjunction
-    2.      CD	    Cardinal number
-    3.	    DT	    Determiner
-    4.	    EX	    Existential there
-    5.	    FW	    Foreign word
-    6.	    IN	    Preposition or subordinating conjunction
-    7.	    JJ	    Adjective
-    8.	    JJR	    Adjective, comparative
-    9.	    JJS	    Adjective, superlative
-    10.	    LS	    List item marker
-    11.	    MD	    Modal
-    12.	    NN	    Noun, singular or mass
-    13.	    NNS	    Noun, plural
-    14.	    NNP	    Proper noun, singular
-    15.	    NNPS	Proper noun, plural
-    16.	    PDT	    Predeterminer
-    17.	    POS	    Possessive ending
-    18.	    PRP	    Personal pronoun
-    19.	    PRP$	Possessive pronoun
-    20.	    RB	    Adverb
-    21.	    RBR	    Adverb, comparative
-    22.	    RBS	    Adverb, superlative
-    23.	    RP	    Particle
-    24.	    SYM	    Symbol
-    25.	    TO	    to
-    26.	    UH	    Interjection
-    27.	    VB	    Verb, base form
-    28.	    VBD	    Verb, past tense
-    29.	    VBG	    Verb, gerund or present participle
-    30.	    VBN	    Verb, past participle
-    31.	    VBP	    Verb, non-3rd person singular present
-    32.	    VBZ	    Verb, 3rd person singular present
-    33.	    WDT	    Wh-determiner
-    34.	    WP	    Wh-pronoun
-    35.	    WP$	    Possessive wh-pronoun
-    36.	    WRB	    Wh-adverb
+    2.      CD        Cardinal number
+    3.        DT        Determiner
+    4.        EX        Existential there
+    5.        FW        Foreign word
+    6.        IN        Preposition or subordinating conjunction
+    7.        JJ        Adjective
+    8.        JJR        Adjective, comparative
+    9.        JJS        Adjective, superlative
+    10.        LS        List item marker
+    11.        MD        Modal
+    12.        NN        Noun, singular or mass
+    13.        NNS        Noun, plural
+    14.        NNP        Proper noun, singular
+    15.        NNPS    Proper noun, plural
+    16.        PDT        Predeterminer
+    17.        POS        Possessive ending
+    18.        PRP        Personal pronoun
+    19.        PRP$    Possessive pronoun
+    20.        RB        Adverb
+    21.        RBR        Adverb, comparative
+    22.        RBS        Adverb, superlative
+    23.        RP        Particle
+    24.        SYM        Symbol
+    25.        TO        to
+    26.        UH        Interjection
+    27.        VB        Verb, base form
+    28.        VBD        Verb, past tense
+    29.        VBG        Verb, gerund or present participle
+    30.        VBN        Verb, past participle
+    31.        VBP        Verb, non-3rd person singular present
+    32.        VBZ        Verb, 3rd person singular present
+    33.        WDT        Wh-determiner
+    34.        WP        Wh-pronoun
+    35.        WP$        Possessive wh-pronoun
+    36.        WRB        Wh-adverb
 """
 import os, sys
 
@@ -66,6 +66,8 @@ safe_import("resources")
 from blissymbol import Blissymbol, NEW_BLISSYMBOLS
 from bliss_lexicon import BlissLexicon
 from resources.data.blissnets import BLISSNET, BCI_BLISSNET, ALL_BLISSYMBOLS
+
+import time
 
 
 class LexiconParser:
@@ -155,11 +157,19 @@ class LexiconParser:
     # JSON
     # ====
     def write_python(self, data, filename, obj_name):
+        first_destination = self.DATA_PATH + filename + ".py.bk"
+        second_destination = self.DATA_PATH + filename + ".py"
         with open(
-            self.DATA_PATH + filename + ".py", mode="w", encoding="utf-8"
+            self.DATA_PATH + filename + ".py.bk", mode="w", encoding="utf-8"
         ) as pyfile:
+            pyfile.write("# fmt: off\n")
             pyfile.write(obj_name + " = ")
             pyfile.write(pprint.pformat(data, indent=1))
+            pyfile.write("\n# fmt: on")
+            pyfile.flush()
+
+        os.rename(first_destination, second_destination)
+        time.sleep(1)
 
     def dump_json(self, data, filename, **kwargs):
         """
@@ -402,6 +412,10 @@ class LexiconParser:
             blissymbols.update(bliss_lst)
         blissymbols = sorted(blissymbols, key=lambda b: b.bci_num)
         bliss_dicts = [b.__dict__() for b in blissymbols]
+        for i, v in enumerate(bliss_dicts):
+            bliss_dicts[i]["translations"] = {
+                k: sorted(v) for k, v in sorted(v["translations"].items())
+            }
         if bliss_dicts != self.load_all_blissymbols():
             self.write_python(bliss_dicts, "all_blissymbols", "ALL_BLISSYMBOLS")
             self.refresh_bliss_lexicon(blissymbols)

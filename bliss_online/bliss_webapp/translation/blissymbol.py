@@ -65,6 +65,7 @@ class Blissymbol:
             self.translator = translator
             self.bci_num = 0
             self.synsets = None
+        self.translations = {k: sorted(v) for k, v in self.translations.items()}
 
     @property
     def is_atomic(self):
