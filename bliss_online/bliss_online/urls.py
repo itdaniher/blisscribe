@@ -15,11 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-#import os
-#print("CURR DIR:", os.getcwd())
+
+# import os
+# print("CURR DIR:", os.getcwd())
 
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('bliss_webapp.urls'))
-]
+urlpatterns = [path("admin/", admin.site.urls), path("", include("bliss_webapp.urls"))]

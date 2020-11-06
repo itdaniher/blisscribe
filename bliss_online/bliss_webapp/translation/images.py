@@ -20,34 +20,34 @@ def equate_images(img1, img2):
     :param img2: Image, second image to set equal in size
     :return: 2-tuple(Image, Image), images set to equal sizes
     """
-    img1 = img1.convert('RGBA')
-    img2 = img2.convert('RGBA')
+    img1 = img1.convert("RGBA")
+    img2 = img2.convert("RGBA")
     w1, h1 = img1.size
     w2, h2 = img2.size
 
     if w1 != w2 or h1 != h2:
         bg_size = max(w1, w2), max(h1, h2)
-        bg = Image.new(mode='RGBA', size=bg_size, color=(255, 255, 255, 0))
+        bg = Image.new(mode="RGBA", size=bg_size, color=(255, 255, 255, 0))
 
         if img1.size == bg_size:
-            x = w1//2 - w2//2
-            y = h1//2 - h2//2
+            x = w1 // 2 - w2 // 2
+            y = h1 // 2 - h2 // 2
             bg.paste(img2, (x, y))
             img2 = bg
         elif img2.size == bg_size:
-            x = w2//2 - w1//2
-            y = h2//2 - h1//2
+            x = w2 // 2 - w1 // 2
+            y = h2 // 2 - h1 // 2
             bg.paste(img1, (x, y))
             img1 = bg
         else:
             bg_img1 = bg
             bg_img2 = bg_img1.copy()
-            x_mid = bg_size[0]//2
-            y_mid = bg_size[1]//2
-            x1 = x_mid - img1.size[0]//2
-            y1 = y_mid - img1.size[1]//2
-            x2 = x_mid - img2.size[0]//2
-            y2 = y_mid - img2.size[1]//2
+            x_mid = bg_size[0] // 2
+            y_mid = bg_size[1] // 2
+            x1 = x_mid - img1.size[0] // 2
+            y1 = y_mid - img1.size[1] // 2
+            x2 = x_mid - img2.size[0] // 2
+            y2 = y_mid - img2.size[1] // 2
             bg_img1.paste(img1, (x1, y1))
             bg_img2.paste(img2, (x2, y2))
             img1 = bg_img1
@@ -102,8 +102,8 @@ def above(top, bottom):
     bottom_w, bottom_h = bottom.size
     w, h = max(top_w, bottom_w), top_h + bottom_h
     img = Image.new(mode="RGBA", size=(w, h))
-    img.paste(top, (w//2 - top_w//2, 0))
-    img.paste(bottom, (w//2 - bottom_w//2, top.size[1]))
+    img.paste(top, (w // 2 - top_w // 2, 0))
+    img.paste(bottom, (w // 2 - bottom_w // 2, top.size[1]))
     return img
 
 
@@ -138,17 +138,16 @@ def word_image(word, img_h, **kwargs):
     if word == "\n":
         return blank_image(1, img_h)
     else:
-        font = kwargs.get('font', None)
+        font = kwargs.get("font", None)
         if font is None:
-            font_path = kwargs.get('font_path', None)
-            font_size = kwargs.get('font_size', 12)
+            font_path = kwargs.get("font_path", None)
+            font_size = kwargs.get("font_size", 12)
             font = make_font(font_path, font_size)
         img = blank_image(font.getsize(word)[0], img_h)
         sketch = ImageDraw.Draw(img)
-        sketch.text((0, int(font.getsize(word)[0]*0.75)),
-                    text = word,
-                    font=font,
-                    fill="black")
+        sketch.text(
+            (0, int(font.getsize(word)[0] * 0.75)), text=word, font=font, fill="black"
+        )
         return trim_horizontal(img)
 
 
@@ -221,4 +220,3 @@ def trim_horizontal(image):
         return image.crop(bbox)
     else:
         return image
-

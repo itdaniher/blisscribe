@@ -11,11 +11,12 @@ class PhonemeParser(LanguageParser):
     """
     A class for parsing IPA data from Wiktionary in a given language.
     """
+
     STRESS_MARKS = "ˈˌ"
 
     def __init__(self, lang):
         LanguageParser.__init__(self, lang)
-        self.ipas = set()        # this language's IPA symbols
+        self.ipas = set()  # this language's IPA symbols
         self.vowels = OrderedSet([])
         self.consonants = OrderedSet([])
         self.phoneme_dict = {}
@@ -34,8 +35,11 @@ class PhonemeParser(LanguageParser):
             key (X)
             val (OrderedSet(X))
         """
-        first = {phoneme: first[phoneme].union(other.pop(phoneme).pop(phoneme))
-                 for phoneme in first if phoneme in other}
+        first = {
+            phoneme: first[phoneme].union(other.pop(phoneme).pop(phoneme))
+            for phoneme in first
+            if phoneme in other
+        }
         first.update(other)
         return first
 
@@ -68,7 +72,9 @@ class PhonemeParser(LanguageParser):
                         if homophone is None:
                             homophone = IPAWord(fw, language, parser=self)
                             continue
-                        homo = self.nearer_homophone(word_ipa, homophone.get_cleaned_ipa(), ipa)
+                        homo = self.nearer_homophone(
+                            word_ipa, homophone.get_cleaned_ipa(), ipa
+                        )
                         if homo == ipa:
                             homophone = IPAWord(fw, language, parser=self)
                         if word_ipa == ipa:
@@ -111,7 +117,9 @@ class PhonemeParser(LanguageParser):
                     elif word_ipa == ipa:
                         return fw
                     else:
-                        homo = self.nearer_homophone(word_ipa, homophone.get_cleaned_ipa(), ipa)
+                        homo = self.nearer_homophone(
+                            word_ipa, homophone.get_cleaned_ipa(), ipa
+                        )
                         if homo == ipa:
                             homophone = IPAWord(fw, language, parser=self)
 
@@ -135,10 +143,10 @@ class PhonemeParser(LanguageParser):
         else:
             sim1, sim2 = 20, 20
             ipa_chars = set(ipa)
-            elt_diffs = lambda i: len(ipa_chars.symmetric_difference(i))/2.0
+            elt_diffs = lambda i: len(ipa_chars.symmetric_difference(i)) / 2.0
             sim1 -= elt_diffs(ipa1)
             sim2 -= elt_diffs(ipa2)
-            elt_sims = lambda i: len(ipa_chars.intersection(i))/2.0
+            elt_sims = lambda i: len(ipa_chars.intersection(i)) / 2.0
             sim1 += elt_sims(ipa1)
             sim2 += elt_sims(ipa2)
             sim1 += self.same_ipas(ipa, ipa1)
@@ -175,7 +183,7 @@ class PhonemeParser(LanguageParser):
                 letter2 = self.ipa_to_ipaletter(char2)
 
                 if letter1 is None or letter2 is None:
-                    sims += (ipa1[i] == ipa2[i])
+                    sims += ipa1[i] == ipa2[i]
                 else:
                     add = letter1.compare(letter2)
                     sims += add
@@ -312,7 +320,9 @@ class PhonemeParser(LanguageParser):
             val (List[str]) - all word's inflections for given type
         """
         language = self.verify_language(language)
-        declension = self.find_wiktionary_subentry(word, language, u"Declension", add_new=add_new)
+        declension = self.find_wiktionary_subentry(
+            word, language, u"Declension", add_new=add_new
+        )
         return declension
 
     def words_declensions(self, words, language=None):
@@ -398,7 +408,9 @@ class PhonemeParser(LanguageParser):
         # TODO: change to end <= min([longest IPA phoneme in phoneme_dict], len(new_ipa))
         while end <= 3:
             new_sym = new_ipa[:end]
-            filtered_sym = "".join(filter((lambda x: x if x not in SEMIVOWELS else ""), new_sym))
+            filtered_sym = "".join(
+                filter((lambda x: x if x not in SEMIVOWELS else ""), new_sym)
+            )
             # check to make sure phonemes are all vowels xor all consonants
             are_vowels = self.is_ipa_vowel(filtered_sym)
             if are_vowels is None:
@@ -481,7 +493,9 @@ class PhonemeParser(LanguageParser):
                 if len(ipa_phonemes) == 0:
                     return
                 elif ipa in ipa_phonemes:
-                    return any(self.is_ipa_vowel(sym) for sym in ipa if sym in IPALETTERS)
+                    return any(
+                        self.is_ipa_vowel(sym) for sym in ipa if sym in IPALETTERS
+                    )
             else:
                 return
         else:
@@ -580,6 +594,7 @@ class IPAWord:
     """
     A class for operating on words and their IPA pronunciations.
     """
+
     def __init__(self, word, language, pos=None, parser=None):
         self.language = language
         if parser is None:
@@ -691,7 +706,9 @@ class IPAWord:
         self.phoneme_dict[chars].add(ipas)
         if self.parser.is_ipa_vowel(ipas):
             self.add_vowel(chars)
-        if self.parser.is_ipa_vowel(ipas) is False or any(self.parser.is_ipa_vowel(ipa) is False for ipa in ipas):
+        if self.parser.is_ipa_vowel(ipas) is False or any(
+            self.parser.is_ipa_vowel(ipa) is False for ipa in ipas
+        ):
             self.add_consonant(chars)
         self.parser.add_phoneme_entry(chars, ipas)
 
@@ -913,14 +930,14 @@ class IPAWord:
         phonemes = []
 
         size = len(cleaned_ipa)
-        start = 0   # inclusive
-        end = 1     # exclusive
+        start = 0  # inclusive
+        end = 1  # exclusive
 
         while end <= size:
             if end != size and cleaned_ipa[end] in SYMBOLS:
                 if cleaned_ipa[end] in AFFRICATES:
                     end += 1  # skip 2 for affricates
-                end += 1      # skip 1 for diacritics
+                end += 1  # skip 1 for diacritics
             else:
                 phoneme = cleaned_ipa[start:end]
                 phonemes.append(phoneme)
@@ -943,11 +960,11 @@ class IPAWord:
 
         for i in ipas_iter:
             try:
-                ipas[i+2]
+                ipas[i + 2]
             except IndexError:
                 pass
             else:
-                phone_2 = ipas[i:i+2]
+                phone_2 = ipas[i : i + 2]
                 if self.parser.is_ipa_vowel(phone_2):
                     phonemes.append(phone_2)
                     next(ipas_iter)
@@ -960,11 +977,11 @@ class IPAWord:
                 continue
 
             try:
-                ipas[i+3]
+                ipas[i + 3]
             except IndexError:
                 pass
             else:
-                phone_3 = ipas[i:i+3]
+                phone_3 = ipas[i : i + 3]
                 if self.parser.is_ipa_vowel(phone_3):
                     phonemes.append(phone_3)
                     next(ipas_iter)
@@ -989,7 +1006,7 @@ class IPAWord:
 
         for i in ipas_iter:
             try:
-                phone_1 = ipas[i:i+1]
+                phone_1 = ipas[i : i + 1]
             except IndexError:
                 pass
             else:
@@ -1005,7 +1022,7 @@ class IPAWord:
                 continue
 
             try:
-                phone_2 = ipas[i:i+2]
+                phone_2 = ipas[i : i + 2]
             except IndexError:
                 pass
             else:
@@ -1042,7 +1059,9 @@ class IPAWord:
             next_ipa = ipa
 
             while len(next_ipa) != 0:
-                next_phoneme, next_ipa = self.parser.next_phoneme(next_ipa, use_syllables)
+                next_phoneme, next_ipa = self.parser.next_phoneme(
+                    next_ipa, use_syllables
+                )
                 phonemes.append(next_phoneme)
 
             return phonemes
@@ -1075,8 +1094,9 @@ class IPAWord:
             # there MUST be consonant letter(s) @ beginning of word
             # at least 1st letter is consonant
             vowel_start += 1
-            while all(self.parser.is_letter_vowel(c) is False for c in word[:vowel_start+1]) \
-                    and vowel_start+1 < len(word):
+            while all(
+                self.parser.is_letter_vowel(c) is False for c in word[: vowel_start + 1]
+            ) and vowel_start + 1 < len(word):
                 vowel_start += 1
             char = word[:vowel_start]
             self.add_phoneme_entry(char, onset)
@@ -1086,8 +1106,13 @@ class IPAWord:
             # there MUST be consonant letter(s) @ end of word
             # at least last letter is consonant
             vowel_end = -1
-            while all(self.parser.is_letter_vowel(c) is not True for c in word[vowel_end-1:]) \
-                    and vowel_end-1 > vowel_start:
+            while (
+                all(
+                    self.parser.is_letter_vowel(c) is not True
+                    for c in word[vowel_end - 1 :]
+                )
+                and vowel_end - 1 > vowel_start
+            ):
                 vowel_end -= 1
             char = word[vowel_end:]
             self.add_phoneme_entry(char, coda)
@@ -1202,7 +1227,9 @@ class IPAWord:
         """
         word = self.word if word is None else word
         ipas = self.find_ipa_phonemes(self.ipa) if ipas is None else ipas
-        score = (abs(len(word) - len(ipas)) + (max(0, len(word) - 2)))**2 + sum((len(sym)-1)**2 for sym in ipas)
+        score = (abs(len(word) - len(ipas)) + (max(0, len(word) - 2))) ** 2 + sum(
+            (len(sym) - 1) ** 2 for sym in ipas
+        )
         return score
 
     def add_syllables(self, ipa):
@@ -1319,7 +1346,7 @@ class IPAWord:
             sym = ipa[i]
 
             if self.parser.is_ipa_vowel(sym):
-                while i < len(ipa)-1 and self.parser.is_ipa_vowel(sym) is not False:
+                while i < len(ipa) - 1 and self.parser.is_ipa_vowel(sym) is not False:
                     i = next(ipa_iter)
                     sym = ipa[i]
 
@@ -1438,4 +1465,3 @@ class IPAWord:
         :return: int, length of this IPAWord's word
         """
         return len(self.get_word())
-

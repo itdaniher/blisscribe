@@ -6,6 +6,7 @@ LANGUAGE_PARSER:
     a particular language from Wiktionary.
 """
 import os, sys
+
 sys.path.append(os.path.realpath(__file__))
 try:
     import tokenizers as tokenizers
@@ -287,7 +288,7 @@ class LanguageParser(WiktionaryParser):
 
         while delta <= 50000 and word_lang is None:
             common_dicts = {lang: self.common_words(lang, lim=delta) for lang in langs}
-            min_idx = float('inf')
+            min_idx = float("inf")
 
             for lang in langs:
                 try:
@@ -485,10 +486,10 @@ class LanguageParser(WiktionaryParser):
             defn_phrase = [defn_phrase]
 
         def search_subentry(subentry):
-            for defn in subentry['definitions']:
+            for defn in subentry["definitions"]:
                 if all(d in defn for d in defn_phrase):
                     defn_words = tokenizers.wordpunct_tokenize(defn)
-                    for lemma in subentry['lemmas'][lang]:
+                    for lemma in subentry["lemmas"][lang]:
                         if lemma in defn_words:
                             print("LEMMA OF", word, "IS", lemma)
                             return lemma
@@ -516,19 +517,32 @@ class LanguageParser(WiktionaryParser):
             return None
 
     def find_sublemmas(self, word, lang, pos=None):
-        word_page = self.find_page_language(self.word_page(word, eng=False), lang, eng=False)
+        word_page = self.find_page_language(
+            self.word_page(word, eng=False), lang, eng=False
+        )
         page_sibs = word_page.find_next_siblings()
         sublemmas = OrderedSet([])
         for sib in page_sibs:
-            if sib.name == 'h2' and sib.find('span', attrs={'id': self.LANG_CODES[lang]}) is None:
+            if (
+                sib.name == "h2"
+                and sib.find("span", attrs={"id": self.LANG_CODES[lang]}) is None
+            ):
                 break
             sibtxt = sib.get_text()
-            if any(str(dig) in sibtxt for dig in range(1, 9)):  # check digits for definition numbers
-                links = sib.find_all('a')
-                lemmas = [link.get('title') for link in links
-                            if link.get('href') == '/wiki/' + link.get('title',' ')]
+            if any(
+                str(dig) in sibtxt for dig in range(1, 9)
+            ):  # check digits for definition numbers
+                links = sib.find_all("a")
+                lemmas = [
+                    link.get("title")
+                    for link in links
+                    if link.get("href") == "/wiki/" + link.get("title", " ")
+                ]
                 for lemma in lemmas:
-                    if pos is None or any(p in pos for p in self.word_poses(lemma, lang=lang, add_new=False)):
+                    if pos is None or any(
+                        p in pos
+                        for p in self.word_poses(lemma, lang=lang, add_new=False)
+                    ):
                         sublemmas.add(lemma)
 
             return sublemmas.items()
@@ -652,7 +666,9 @@ class LanguageParser(WiktionaryParser):
         :return: List[unicode], IPA transcriptions of word
         """
         lang = self.verify_language(lang)
-        entry = self.find_wiktionary_subentry(word, lang, u"Pronunciation", add_new=True)
+        entry = self.find_wiktionary_subentry(
+            word, lang, u"Pronunciation", add_new=True
+        )
         if entry is None:
             entry = []
         if len(entry) == 0:
@@ -832,7 +848,11 @@ class LanguageParser(WiktionaryParser):
 
         while len(todo) != 0:
             curr_word = todo.pop()
-            if len(curr_word) != 0 and curr_word not in morphemes.items_set and not self.contains_punct(curr_word):
+            if (
+                len(curr_word) != 0
+                and curr_word not in morphemes.items_set
+                and not self.contains_punct(curr_word)
+            ):
                 morphemes.add(curr_word)
                 word_morphemes = self.word_morphemes(curr_word, lang)
                 if word_morphemes is not None:
@@ -902,7 +922,9 @@ class LanguageParser(WiktionaryParser):
         :param word: str, word for inflections to get inflections of
         :return: List[str], all inflected forms of word
         """
-        return self.find_wiktionary_subentry(word, language, u"Inflections", add_new=add_new)
+        return self.find_wiktionary_subentry(
+            word, language, u"Inflections", add_new=add_new
+        )
 
     def lookup_word_etymology(self, word, lang=None):
         """
@@ -1048,9 +1070,12 @@ class LanguageParser(WiktionaryParser):
             return
 
         words = []
-        path = PATH + "/resources/frequency_words/content/2016/%s/%s_50k.txt" % (lang_code, lang_code)
+        path = PATH + "/resources/frequency_words/content/2016/%s/%s_50k.txt" % (
+            lang_code,
+            lang_code,
+        )
 
-        with open(path, 'r') as fifty_k:
+        with open(path, "r") as fifty_k:
             line_no = 0
             for line in fifty_k:
                 word = str(line).split(" ", 1)[0]
@@ -1066,9 +1091,12 @@ class LanguageParser(WiktionaryParser):
         lang_code = self.lang_code(lang)
         if lang_code is None:
             return
-        path = PATH + "/resources/frequency_words/content/2016/%s/%s_50k.txt" % (lang_code, lang_code)
+        path = PATH + "/resources/frequency_words/content/2016/%s/%s_50k.txt" % (
+            lang_code,
+            lang_code,
+        )
 
-        with open(path, 'r') as common_words:
+        with open(path, "r") as common_words:
             idx_line = common_words.readlines()[idx]
             idx_word = str(idx_line).split(" ", 1)[0]
             return idx_word
@@ -1087,7 +1115,9 @@ class LanguageParser(WiktionaryParser):
 
         if lang == "English":
             word_pairs = self.get_wordnet_word_pairs()
-            return [word_pair for word_pair in word_pairs if word_pair[0] in common_words]
+            return [
+                word_pair for word_pair in word_pairs if word_pair[0] in common_words
+            ]
         else:
             poses = [self.word_poses(word, lang) for word in common_words]
             word_pairs = []
@@ -1143,8 +1173,9 @@ class LanguageParser(WiktionaryParser):
         :return: str, Wiktionary URL for this parser's lemmas
         """
         lang = self.verify_language(lang)
-        return (self.WIKI_URL + self.END_URL + self.LEMMA_PATH).format(lang_code="en",  #self.get_lang_code(language),
-                                                                       lang=lang)
+        return (self.WIKI_URL + self.END_URL + self.LEMMA_PATH).format(
+            lang_code="en", lang=lang  # self.get_lang_code(language),
+        )
 
     def ipa_url(self, lang=None):
         """
@@ -1154,6 +1185,6 @@ class LanguageParser(WiktionaryParser):
         :return: str, Wiktionary URL for this parser's IPAs
         """
         lang = self.verify_language(lang)
-        return (self.WIKI_URL + self.END_URL + self.IPA_PATH).format(lang_code="en",  #self.get_lang_code(language),
-                                                                     lang=lang)
-
+        return (self.WIKI_URL + self.END_URL + self.IPA_PATH).format(
+            lang_code="en", lang=lang  # self.get_lang_code(language),
+        )

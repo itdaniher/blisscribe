@@ -2,5 +2,4 @@ from django.apps import AppConfig
 
 
 class BlissWebappConfig(AppConfig):
-    name = 'bliss_online'
-
+    name = "bliss_online"

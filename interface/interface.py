@@ -16,11 +16,12 @@ class BlissGame:
     Users can choose whether they'd prefer to download a PDF
     or read in-app.
     """
+
     FILE_PATH = os.path.dirname(os.path.realpath(__file__)) + "/"
 
     ORIGIN = (0, 0)
-    WIDTH = 1000 #1024
-    HEIGHT = 700 #768
+    WIDTH = 1000  # 1024
+    HEIGHT = 700  # 768
     RESOLUTION = (WIDTH, HEIGHT)
     HEADER = pygame.image.load(FILE_PATH + "header.png")
     TICK = 1000
@@ -28,22 +29,24 @@ class BlissGame:
     HEADER_FONT = ImageFont.truetype(font="Arial Rounded Bold.ttf", size=50)
     FONT = ImageFont.truetype(font="Arial Rounded Bold.ttf", size=25)
 
-    COLOURS = {"charcoal": (44, 44, 44),
-               "yellow": (243, 220, 26),
-               "grey": (200, 200, 200),
-               "white": (255, 255, 255)}
+    COLOURS = {
+        "charcoal": (44, 44, 44),
+        "yellow": (243, 220, 26),
+        "grey": (200, 200, 200),
+        "white": (255, 255, 255),
+    }
 
     def __init__(self):
         self.clock = pygame.time.Clock()
         self.bg = None
-        self.translator = None #blisscribe.BlissTranslator()
+        self.translator = None  # blisscribe.BlissTranslator()
         self.screen = None
         self.main()
 
     def init_screen(self):
         if self.screen is None:
             self.screen = pygame.display.set_mode(self.RESOLUTION)
-            #screen = pygame.display.set_mode(self.RESOLUTION, FULLSCREEN)
+            # screen = pygame.display.set_mode(self.RESOLUTION, FULLSCREEN)
 
     def init_bg(self):
         if self.bg is None:
@@ -52,9 +55,13 @@ class BlissGame:
     def init_translator(self, language, font_path=None, font_size=20):
         if self.translator is None:
             if font_path is None:
-                self.translator = blisscribe.BlissTranslator(language, font_size=font_size)
+                self.translator = blisscribe.BlissTranslator(
+                    language, font_size=font_size
+                )
             else:
-                self.translator = blisscribe.BlissTranslator(language, font_path, font_size)
+                self.translator = blisscribe.BlissTranslator(
+                    language, font_path, font_size
+                )
         else:
             self.translator.set_language(language)
             if font_path is not None:
@@ -69,17 +76,17 @@ class BlissGame:
         :param res: tuple(int,int), background to fit tile to
         :return: Image, tiled background of size res
         """
-        img = Image.open("bg_tile.jpeg") #self.load_surface("bg_tile.jpeg")
+        img = Image.open("bg_tile.jpeg")  # self.load_surface("bg_tile.jpeg")
         w, h = res
         imgw, imgh = img.size
 
         if w < imgw or h < imgh:
             return img
-        background = Image.new("RGBA", res, (255,255,255,255))
+        background = Image.new("RGBA", res, (255, 255, 255, 255))
 
         for x in range(0, w, imgw):
             for y in range(0, h, imgh):
-                background.paste(img, (x,y))
+                background.paste(img, (x, y))
 
         background.save("background.png")
 
@@ -97,20 +104,24 @@ class BlissGame:
         sketch = ImageDraw.Draw(button)
         textsize = sketch.textsize(text=label, font=self.FONT)
         textw, texth = textsize
-        sketch.text((size[0]/2 - textw/2, size[1]/2 - texth/2),
-                    label,
-                    font=self.FONT,
-                    fill=(255, 255, 255))
+        sketch.text(
+            (size[0] / 2 - textw / 2, size[1] / 2 - texth / 2),
+            label,
+            font=self.FONT,
+            fill=(255, 255, 255),
+        )
         return button
 
     def make_buttons(self, labels):
         # later include "teach" for ML
         # later allow users to hover over a word/Blissymbol to retrieve
         #   definitions & alternate translations
-        button_w = self.WIDTH // (len(labels)*2)
+        button_w = self.WIDTH // (len(labels) * 2)
         button_h = self.HEIGHT // 10
         button_wh = (button_w, button_h)
-        buttons = {label: self.make_button(label.lower(), button_wh) for label in labels}
+        buttons = {
+            label: self.make_button(label.lower(), button_wh) for label in labels
+        }
         return buttons
 
     def render_buttons(self, buttons, selected, space=50):
@@ -130,20 +141,20 @@ class BlissGame:
         img = buttons[label]
         button_w, button_h = img.size
         total_h = (button_h + space) * len(buttons)
-        start_h = (self.HEIGHT - space*(len(buttons) - 1)) - total_h
+        start_h = (self.HEIGHT - space * (len(buttons) - 1)) - total_h
 
-        for y in range(start_h, self.HEIGHT, button_h+space):
+        for y in range(start_h, self.HEIGHT, button_h + space):
             img = buttons[label]
 
             if label == selected:
                 frame = 10
-                size = (button_w+frame, button_h+frame)
+                size = (button_w + frame, button_h + frame)
                 bg = Image.new("RGBA", size, self.COLOURS["grey"])
-                bg.paste(img, (frame//2, frame//2))
+                bg.paste(img, (frame // 2, frame // 2))
                 img = bg
 
             button = self.img_to_surface(img)
-            x = self.WIDTH//2 - img.size[0]//2
+            x = self.WIDTH // 2 - img.size[0] // 2
             self.screen.blit(button, (x, y))
             try:
                 label = next(buttons_iter)
@@ -175,7 +186,7 @@ class BlissGame:
             screen = self.screen
 
         if posn is None:
-            width, height = screen.get_width()//6, screen.get_height()//6
+            width, height = screen.get_width() // 6, screen.get_height() // 6
         else:
             width, height = posn
 
@@ -183,8 +194,7 @@ class BlissGame:
         msg_w = msg.get_width()
         msg_h = msg.get_height()
 
-        screen.blit(msg,
-                    (width-(msg_w//2), height-(msg_h//2)))
+        screen.blit(msg, (width - (msg_w // 2), height - (msg_h // 2)))
 
         pygame.display.flip()
 
@@ -211,25 +221,33 @@ class BlissGame:
             screen = self.screen
 
         if posn is None:
-            width, height = screen.get_width()//6, screen.get_height()//6
+            width, height = screen.get_width() // 6, screen.get_height() // 6
         else:
             width, height = posn
 
         msg = fontobject.render(message, 1, self.COLOURS["charcoal"])
-        msg_w = self.WIDTH*(1/2.0) #msg.get_width()
-        msg_h = msg.get_height()  #self.HEIGHT/10.0 #msg.get_height()
+        msg_w = self.WIDTH * (1 / 2.0)  # msg.get_width()
+        msg_h = msg.get_height()  # self.HEIGHT/10.0 #msg.get_height()
 
-        pygame.draw.rect(screen, self.COLOURS["white"],
-                         (width, # width - box_w/2,
-                          height, # height - box_h/2,
-                          msg_w, msg_h), 0)
-        pygame.draw.rect(screen, self.COLOURS["charcoal"],
-                         (width - frame, #width - (msg_w+frame)/2,
-                          height - frame, #height - (msg_h+frame)/2,
-                          msg_w + frame, msg_h + frame), 1) #msg_w+frame, msg_h+frame), 1)
+        pygame.draw.rect(
+            screen,
+            self.COLOURS["white"],
+            (width, height, msg_w, msg_h),  # width - box_w/2,  # height - box_h/2,
+            0,
+        )
+        pygame.draw.rect(
+            screen,
+            self.COLOURS["charcoal"],
+            (
+                width - frame,  # width - (msg_w+frame)/2,
+                height - frame,  # height - (msg_h+frame)/2,
+                msg_w + frame,
+                msg_h + frame,
+            ),
+            1,
+        )  # msg_w+frame, msg_h+frame), 1)
 
-        screen.blit(msg,
-                    (width, height))
+        screen.blit(msg, (width, height))
 
         pygame.display.flip()
 
@@ -256,10 +274,10 @@ class BlissGame:
         return "".join(current_string)
 
     def translate(self):
-        start_x = self.WIDTH//10
-        start_y = self.HEIGHT//10
+        start_x = self.WIDTH // 10
+        start_y = self.HEIGHT // 10
         text = self.ask("text to translate", self.screen, (start_x, start_y))
-        language = self.ask("language", self.screen, (start_x, start_y*2))
+        language = self.ask("language", self.screen, (start_x, start_y * 2))
         font_size = 20
         self.init_translator(language, font_size=font_size)
         inkey = self.get_key()
@@ -288,9 +306,14 @@ class BlissGame:
                 poses.update(blisscribe.OTHER)
 
             self.blit_bg()
-            pdf = self.translator.translate(text, title=title, img_w=self.WIDTH, imgls_h=self.HEIGHT,
-                                            page_nums=page_nums)
-            '''
+            pdf = self.translator.translate(
+                text,
+                title=title,
+                img_w=self.WIDTH,
+                imgls_h=self.HEIGHT,
+                page_nums=page_nums,
+            )
+            """
             pages = self.translator.translate_to_pages(text, title=title, img_w=self.WIDTH, img_h=self.HEIGHT)
             pages = [self.img_to_surface(blisscribe.overlay(pg, blisscribe.blank_image(pg.size[0], pg.size[1])))
                      for pg in pages]
@@ -313,7 +336,7 @@ class BlissGame:
                 #self.screen.fill(self.COLOURS["white"])
                 self.screen.blit(page, self.ORIGIN)
                 pygame.display.flip()
-            '''
+            """
 
         elif inkey == K_ESCAPE:
             return 0
@@ -333,8 +356,8 @@ class BlissGame:
         bgw, bgh = self.WIDTH, (icon_h + space) * 2
 
         title_w, title_h = self.HEADER_FONT.getsize(title)
-        x, y = bgw//2 - title_w//2, bgh - space - title_h
-        left, upper = self.WIDTH//2 - icon_w//2, y - space - icon_h
+        x, y = bgw // 2 - title_w // 2, bgh - space - title_h
+        left, upper = self.WIDTH // 2 - icon_w // 2, y - space - icon_h
 
         header = Image.new("RGBA", (bgw, bgh), (255, 255, 255, 0))
         header.paste(icon, (left, upper))
@@ -381,7 +404,7 @@ class BlissGame:
         #   translate uncommon words
         #   include page #s
         pygame.init()
-        pygame.display.set_caption('Blisscribe')
+        pygame.display.set_caption("Blisscribe")
 
         level = True
         labels = ["translate", "learn"]
@@ -435,7 +458,7 @@ class BlissGame:
 
                 pygame.display.flip()
 
-            #self.get_mouse()
+            # self.get_mouse()
 
             pygame.display.flip()
 
@@ -506,11 +529,21 @@ class BlissGame:
         #   translate uncommon words
         #   include page #s
         pygame.init()
-        pygame.display.set_caption('Blisscribe')
+        pygame.display.set_caption("Blisscribe")
 
         level = True
         # incl form for native grammar vs bliss grammar
-        forms = ['language', 'font family', 'font size', 'nouns', 'verbs', 'adjvs', 'other', 'title', 'text']
+        forms = [
+            "language",
+            "font family",
+            "font size",
+            "nouns",
+            "verbs",
+            "adjvs",
+            "other",
+            "title",
+            "text",
+        ]
         labels = ["translate", "learn"]
         selected = 0
 
@@ -624,4 +657,3 @@ class BlissGame:
 
 
 bg = BlissGame()
-

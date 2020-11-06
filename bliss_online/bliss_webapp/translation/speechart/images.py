@@ -16,34 +16,34 @@ def equate_images(img1, img2):
     :param img2: Image, second image to set equal in size
     :return: 2-tuple(Image, Image), images set to equal sizes
     """
-    img1 = img1.convert('RGBA')
-    img2 = img2.convert('RGBA')
+    img1 = img1.convert("RGBA")
+    img2 = img2.convert("RGBA")
     w1, h1 = img1.size
     w2, h2 = img2.size
 
     if w1 != w2 or h1 != h2:
         bg_size = max(w1, w2), max(h1, h2)
-        bg = Image.new(mode='RGBA', size=bg_size, color=(255, 255, 255, 0))
+        bg = Image.new(mode="RGBA", size=bg_size, color=(255, 255, 255, 0))
 
         if img1.size == bg_size:
-            x = w1//2 - w2//2
-            y = h1//2 - h2//2
+            x = w1 // 2 - w2 // 2
+            y = h1 // 2 - h2 // 2
             bg.paste(img2, (x, y))
             img2 = bg
         elif img2.size == bg_size:
-            x = w2//2 - w1//2
-            y = h2//2 - h1//2
+            x = w2 // 2 - w1 // 2
+            y = h2 // 2 - h1 // 2
             bg.paste(img1, (x, y))
             img1 = bg
         else:
             bg_img1 = bg
             bg_img2 = bg_img1.copy()
-            x_mid = bg_size[0]//2
-            y_mid = bg_size[1]//2
-            x1 = x_mid - img1.size[0]//2
-            y1 = y_mid - img1.size[1]//2
-            x2 = x_mid - img2.size[0]//2
-            y2 = y_mid - img2.size[1]//2
+            x_mid = bg_size[0] // 2
+            y_mid = bg_size[1] // 2
+            x1 = x_mid - img1.size[0] // 2
+            y1 = y_mid - img1.size[1] // 2
+            x2 = x_mid - img2.size[0] // 2
+            y2 = y_mid - img2.size[1] // 2
             bg_img1.paste(img1, (x1, y1))
             bg_img2.paste(img2, (x2, y2))
             img1 = bg_img1
@@ -73,16 +73,16 @@ def overlay(front, back, equate=True):
     else:
         w, h = max(front.size[0], back.size[0]), max(front.size[1], back.size[1])
         img = make_blank_img(w, h, opacity=0)
-        front_x = w//2 - front.size[0]//2
-        front_y = h//2 - front.size[1]//2
-        back_x = w//2 - back.size[0]//2
-        back_y = h//2 - back.size[1]//2
+        front_x = w // 2 - front.size[0] // 2
+        front_y = h // 2 - front.size[1] // 2
+        back_x = w // 2 - back.size[0] // 2
+        back_y = h // 2 - back.size[1] // 2
         img.paste(back, (back_x, back_y))
         img.paste(front, (front_x, front_y))
     return img
 
 
-def beside(left, right, align='bottom', trim_imgs=True):
+def beside(left, right, align="bottom", trim_imgs=True):
     """
     Places left image beside right image.
     ~
@@ -101,21 +101,21 @@ def beside(left, right, align='bottom', trim_imgs=True):
     w, h = left.size[0] + right.size[0], max(left.size[1], right.size[1])
     img = Image.new(mode="RGBA", size=(w, h))
 
-    if align == 'top':
+    if align == "top":
         ly, ry = 0, 0
-    elif align == 'bottom':
+    elif align == "bottom":
         ly = h - left.size[1]
         ry = h - right.size[1]
     else:  # center or otherwise
-        ly = (h//2 - left.size[1]//2)
-        ry = (h//2 - right.size[1]//2)
+        ly = h // 2 - left.size[1] // 2
+        ry = h // 2 - right.size[1] // 2
 
     img.paste(left, (0, ly))
     img.paste(right, (left.size[0], ry))
     return img
 
 
-def beside_all(imgs, align='bottom', space=0, trim_imgs=True):
+def beside_all(imgs, align="bottom", space=0, trim_imgs=True):
     """
     Places each image in imgs beside each other.
     ~
@@ -138,7 +138,7 @@ def beside_all(imgs, align='bottom', space=0, trim_imgs=True):
     return final_img
 
 
-def above(top, bottom, align='center'):
+def above(top, bottom, align="center"):
     """
     Places top image above bottom image.
     ~
@@ -155,21 +155,21 @@ def above(top, bottom, align='center'):
     w, h = max(top_w, bottom_w), top_h + bottom_h
     img = Image.new(mode="RGBA", size=(w, h))
 
-    if align == 'left':
+    if align == "left":
         x1, x2 = 0, 0
-    elif align == 'right':
+    elif align == "right":
         x1 = w - top_w
         x2 = w - bottom_w
     else:
-        x1 = w//2 - top_w//2
-        x2 = w//2 - bottom_w//2
+        x1 = w // 2 - top_w // 2
+        x2 = w // 2 - bottom_w // 2
 
     img.paste(top, (x1, 0))
     img.paste(bottom, (x2, top.size[1]))
     return img
 
 
-def above_all(imgs, align='center'):
+def above_all(imgs, align="center"):
     """
     Places top image above bottom image.
     ~
@@ -249,49 +249,51 @@ def trim_horizontal(img):
         return img
 
 
-def circle(width, height=None, fill='white', outline=None, opacity=0):
+def circle(width, height=None, fill="white", outline=None, opacity=0):
     height = width if height is None else height
     img = make_blank_img(width, height, opacity=opacity)
     draw = ImageDraw.Draw(img)
     outline = fill if outline is None else outline
-    draw.ellipse((0, 0, width-1, height-1), fill, outline)
+    draw.ellipse((0, 0, width - 1, height - 1), fill, outline)
     return img
 
 
-def rectangle(width, height, fill='white', outline=None, opacity=0):
+def rectangle(width, height, fill="white", outline=None, opacity=0):
     img = make_blank_img(width, height, opacity=opacity)
     draw = ImageDraw.Draw(img)
-    draw.rectangle((0, 0, width-1, height-1), fill, outline)
+    draw.rectangle((0, 0, width - 1, height - 1), fill, outline)
     return img
 
 
-def triangle(width, height, fill='white', vertical=True, outline=None, opacity=0):
+def triangle(width, height, fill="white", vertical=True, outline=None, opacity=0):
     img = make_blank_img(width, height, opacity=opacity)
     draw = ImageDraw.Draw(img)
     outline = fill if outline is None else outline
-    width, height = width-1, height-1
+    width, height = width - 1, height - 1
     min_w, max_w = sorted([0, width])
     min_h, max_h = sorted([0, height])
     if vertical:
-        dims = [(0, min_h), (width//2, max_h), (width, min_h)]
+        dims = [(0, min_h), (width // 2, max_h), (width, min_h)]
     else:
-        dims = [(min_w, 0), (min_w, height), (max_w, height//2)]
+        dims = [(min_w, 0), (min_w, height), (max_w, height // 2)]
     draw.polygon(dims, fill, outline)
     return img
 
 
-def polygon(width, height, num_sides, fill='white', vertical=True, outline=None, opacity=0):
+def polygon(
+    width, height, num_sides, fill="white", vertical=True, outline=None, opacity=0
+):
     if num_sides > 2:
         img = make_blank_img(width, height, opacity=opacity)
         draw = ImageDraw.Draw(img)
         outline = fill if outline is None else outline
-        width, height = width-1, height-1
+        width, height = width - 1, height - 1
         min_w, max_w = sorted([0, width])
         min_h, max_h = sorted([0, height])
-        mid_x = max_w//2
-        mid_y = max_h//2
+        mid_x = max_w // 2
+        mid_y = max_h // 2
         if vertical:
-            num_mids = num_sides - 2 #max(0, (num_sides % 2) - 2)
+            num_mids = num_sides - 2  # max(0, (num_sides % 2) - 2)
             # min_w, min_h
             # max_w/(num_sides-1), max_h/(num_sides-1)
             # max_w/(num_sides-1) * 2, max_h/(num_sides-1) * 2...
@@ -304,20 +306,26 @@ def polygon(width, height, num_sides, fill='white', vertical=True, outline=None,
             # square: (0,0), (0, width), (0, height), (width, height)
             # pentagon:
 
-
             dims = [(0, min_h), (width, min_h)]
             if num_mids != 0:
                 # width, min_h
-                mid_tups = [(mid_x - max_w/(num_sides-i), mid_y - max_h/(num_sides-i)) if i < num_mids
-                            else (mid_x + max_w/(num_sides-num_mids-i), mid_y + max_h/(num_sides-num_mids-i))
-                            for i in range(1, num_mids)]
+                mid_tups = [
+                    (mid_x - max_w / (num_sides - i), mid_y - max_h / (num_sides - i))
+                    if i < num_mids
+                    else (
+                        mid_x + max_w / (num_sides - num_mids - i),
+                        mid_y + max_h / (num_sides - num_mids - i),
+                    )
+                    for i in range(1, num_mids)
+                ]
                 dims = dims[:1] + mid_tups + dims[-1:]
                 print(dims)
         else:
-            dims = [(min_w, 0), (min_w, height), (max_w, height/(num_sides-1))]
+            dims = [(min_w, 0), (min_w, height), (max_w, height / (num_sides - 1))]
         draw.polygon(dims, fill, outline)
         img.show()
         return img
+
 
 def load_default_font(font_name="Arial Bold.ttf", size=12):
     font = "/Library/Fonts/{}".format(font_name)
@@ -341,8 +349,16 @@ def text_size(text, lang="English", size=12, font=None):
     return font.getsize(text)
 
 
-def text_image(message, lang="English", size=12, colour="black", bg_fill=(255, 255, 255),
-               opacity=255, bg_opacity=0, font=None):
+def text_image(
+    message,
+    lang="English",
+    size=12,
+    colour="black",
+    bg_fill=(255, 255, 255),
+    opacity=255,
+    bg_opacity=0,
+    font=None,
+):
     if font is None:
         font = load_default_font(lang_font(lang), size=size)
     w, h = font.getsize(message)
@@ -352,10 +368,22 @@ def text_image(message, lang="English", size=12, colour="black", bg_fill=(255, 2
     return img
 
 
-def arrow(width, height, fill='black', angle=0, label=None, align_label=False,
-          opacity=0, lang="English", font=None, font_size=0):
+def arrow(
+    width,
+    height,
+    fill="black",
+    angle=0,
+    label=None,
+    align_label=False,
+    opacity=0,
+    lang="English",
+    font=None,
+    font_size=0,
+):
     vertical = width < height
-    arrow_w, arrow_h = (3 * (width if vertical else height),) * 2  # width & height of arrowhead are 3 * stem width
+    arrow_w, arrow_h = (
+        3 * (width if vertical else height),
+    ) * 2  # width & height of arrowhead are 3 * stem width
     arrowhead = triangle(arrow_w, arrow_h, fill, vertical, opacity=opacity)
     rect_w = abs(width - (arrow_w if not vertical else 0))
     rect_h = abs(height - (arrow_h if vertical else 0))
@@ -368,7 +396,7 @@ def arrow(width, height, fill='black', angle=0, label=None, align_label=False,
     else:
         # if width >= 0, arrow points right; otherwise, points left
         left, right = (stem, arrowhead) if width >= 0 else (arrowhead, stem)
-        img = beside(left, right, align='center')
+        img = beside(left, right, align="center")
 
     if label is not None:
         txt = text_image(label, lang, opacity=0, size=font_size, font=font)
@@ -393,8 +421,9 @@ def rotate(img, angle):
     """
     if angle != 0:
         max_dim = max(img.size)
-        img = overlay(img,
-                      make_blank_img(max_dim * 2, max_dim * 2, opacity=0)).rotate(angle)
+        img = overlay(img, make_blank_img(max_dim * 2, max_dim * 2, opacity=0)).rotate(
+            angle
+        )
     return img
 
 
@@ -413,12 +442,12 @@ def venn_diagram(colours, diameter=100):
 
     for rgb in colours:
         colour = rgb[:3] + (opacity,)
-        circ = circle(diameter, height=diameter*2, fill=colour, opacity=0)
+        circ = circle(diameter, height=diameter * 2, fill=colour, opacity=0)
         circles.append(circ)
 
     fill = (255, 255, 255, 0)
     diagram = rectangle(1, 1, fill=fill, opacity=255)
-    bg = rectangle(diameter//2, diameter//2, fill=fill, opacity=255)
+    bg = rectangle(diameter // 2, diameter // 2, fill=fill, opacity=255)
     offset = int(360.0 / len(circles))
     angle = 0
 
@@ -453,7 +482,7 @@ def flower_diagram(colours, diameter=100):
     circles = circles[1:]
     fill = (255, 255, 255, 0)
     diagram = centre
-    bg = rectangle(int(diameter*1.1), int(diameter*1.1), fill=fill, opacity=255)
+    bg = rectangle(int(diameter * 1.1), int(diameter * 1.1), fill=fill, opacity=255)
     offset = int(360.0 / len(circles))
     angle = 0
 
@@ -467,7 +496,7 @@ def flower_diagram(colours, diameter=100):
     return diagram
 
 
-def draw_ellipse(image, bounds, width=1, outline='white', antialias=4):
+def draw_ellipse(image, bounds, width=1, outline="white", antialias=4):
     """Improved ellipse drawing function, based on PIL.ImageDraw."""
     # Source: https://stackoverflow.com/questions/32504246/draw-ellipse-in-python-pil-with-line-thickness
 
@@ -475,12 +504,12 @@ def draw_ellipse(image, bounds, width=1, outline='white', antialias=4):
     # The size of the mask can be increased relative to the imput image
     # to get smoother looking results.
     mask = Image.new(
-        size=[int(dim * antialias) for dim in image.size],
-        mode='L', color='black')
+        size=[int(dim * antialias) for dim in image.size], mode="L", color="black"
+    )
     draw = ImageDraw.Draw(mask)
 
     # draw outer shape in white (color) and inner shape in black (transparent)
-    for offset, fill in (width/-2.0, 'white'), (width/2.0, 'black'):
+    for offset, fill in (width / -2.0, "white"), (width / 2.0, "black"):
         left, top = [(value + offset) * antialias for value in bounds[:2]]
         right, bottom = [(value - offset) * antialias for value in bounds[2:]]
         draw.ellipse([left, top, right, bottom], fill=fill)
@@ -492,7 +521,7 @@ def draw_ellipse(image, bounds, width=1, outline='white', antialias=4):
     image.paste(outline, mask=mask)
 
 
-def draw_arc(image, bounds, width=1, outline='white', antialias=4):
+def draw_arc(image, bounds, width=1, outline="white", antialias=4):
     """Improved arc drawing function, based on PIL.ImageDraw."""
     # Adapted from: https://stackoverflow.com/questions/32504246/draw-ellipse-in-python-pil-with-line-thickness
 
@@ -501,12 +530,12 @@ def draw_arc(image, bounds, width=1, outline='white', antialias=4):
     # to get smoother looking results.
 
     mask = Image.new(
-        size=[int(dim * antialias) for dim in image.size],
-        mode='L', color='black')
+        size=[int(dim * antialias) for dim in image.size], mode="L", color="black"
+    )
     draw = ImageDraw.Draw(mask)
 
     # draw outer shape in white (color) and inner shape in black (transparent)
-    for offset, fill in (width/-2.0, 'white'), (width/2.0, 'black'):
+    for offset, fill in (width / -2.0, "white"), (width / 2.0, "black"):
         left, top = [(value + offset) * antialias for value in bounds[:2]]
         right, bottom = [(value - offset) * antialias for value in bounds[2:]]
         draw.ellipse((left, top, right, bottom), fill=fill)
@@ -518,6 +547,7 @@ def draw_arc(image, bounds, width=1, outline='white', antialias=4):
     halfmask = make_blank_img(mask.size[0], mask.size[1], opacity=0)
     halfmask.paste(outline, mask=mask)
     halfmask = trim(halfmask)
-    halfmask = trim(halfmask, bbox=(0, halfmask.size[1]/2.0, halfmask.size[0], halfmask.size[1]))
+    halfmask = trim(
+        halfmask, bbox=(0, halfmask.size[1] / 2.0, halfmask.size[0], halfmask.size[1])
+    )
     image.paste(halfmask)
-

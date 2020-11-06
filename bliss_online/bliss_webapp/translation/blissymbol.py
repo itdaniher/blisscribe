@@ -7,9 +7,11 @@ BLISSYMBOLS:
     by a user.
 """
 import os, sys
+
 PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(PATH)
 from imports import safe_import
+
 safe_import("images")
 safe_import("parts_of_speech")
 safe_import("resources")
@@ -17,7 +19,9 @@ from images import *
 from parts_of_speech import *
 from resources.data.bci_blissnet import BCI_BLISSNET
 
-NEW_BLISSYMBOLS = []    # stores new Blissymbols from Blissymbol.new_blissymbol() for deletion
+NEW_BLISSYMBOLS = (
+    []
+)  # stores new Blissymbols from Blissymbol.new_blissymbol() for deletion
 
 
 class Blissymbol:
@@ -31,7 +35,16 @@ class Blissymbol:
     :param bci_num: int, this Blissymbol's BCI-AV#, i.e. its official BCI numeric ID
                          -> N.B. initialize as 0 if creating a new Blissymbol
     """
-    def __init__(self, bliss_name=None, pos=None, derivation=list(), translations=None, translator=None, num=None):
+
+    def __init__(
+        self,
+        bliss_name=None,
+        pos=None,
+        derivation=list(),
+        translations=None,
+        translator=None,
+        num=None,
+    ):
         if bliss_name[-5:] != "(OLD)" and bliss_name[-7:] != "ercase)":
             self.translator = translator
             self.bliss_name = bliss_name
@@ -39,7 +52,9 @@ class Blissymbol:
             self.pos = self.init_pos(pos)
             self.derivation = derivation
             self.check_img_filename()  # creates new blissymbol image from derivation if none exists
-            self.translations = self.clean_translations(translations)  # holds translations in different languages
+            self.translations = self.clean_translations(
+                translations
+            )  # holds translations in different languages
             self.synsets = None
             self.init_synsets()
         else:
@@ -61,7 +76,9 @@ class Blissymbol:
 
     @property
     def unicode(self):
-        return self.translator.lex_parser.load_bliss_unicode().get(self.bliss_name, " ".join(self.find_deriv_unicode()))
+        return self.translator.lex_parser.load_bliss_unicode().get(
+            self.bliss_name, " ".join(self.find_deriv_unicode())
+        )
 
     def set_pos(self, pos):
         """
@@ -85,11 +102,11 @@ class Blissymbol:
 
         :return: Image, image of this Blissymbol with given dimensions
         """
-        kwargs.setdefault('width', None)
-        height = kwargs.setdefault('height', self.translator.image_heights())
-        kwargs.setdefault('whitebg', False)
-        is_text = kwargs.setdefault('text_img', False)
-        subs = kwargs.setdefault('subs', False)
+        kwargs.setdefault("width", None)
+        height = kwargs.setdefault("height", self.translator.image_heights())
+        kwargs.setdefault("whitebg", False)
+        is_text = kwargs.setdefault("text_img", False)
+        subs = kwargs.setdefault("subs", False)
         if is_text:
             return word_image(self.bliss_name, img_h=height, subs=subs)
         else:
@@ -102,20 +119,28 @@ class Blissymbol:
     def overlay_indicators(self, img, indicators):
         if len(indicators) == 0:
             return img
-        #elif len(indicators) == 1:
+        # elif len(indicators) == 1:
         #    return self.indicator_image(img, indicators.pop())
         else:
             deriv_inds = self.indicators
-            indicators = sorted(deriv_inds + indicators, key=lambda i: INDICATORS.get(i[11:-1],
-                                                                                      max(INDICATORS.values())+1))
-            ind_imgs = [self.translator.bliss_image(ind, width=img.size[0], height=img.size[1], whitebg=False)
-                        for ind in indicators]
+            indicators = sorted(
+                deriv_inds + indicators,
+                key=lambda i: INDICATORS.get(i[11:-1], max(INDICATORS.values()) + 1),
+            )
+            ind_imgs = [
+                self.translator.bliss_image(
+                    ind, width=img.size[0], height=img.size[1], whitebg=False
+                )
+                for ind in indicators
+            ]
             ind_banner = blank_image(0, 0, 0)
             for ind_img in ind_imgs:
                 ind_banner = beside(ind_banner, ind_img)
             if len(deriv_inds) != 0:
                 # cover up indicator area (up to 350y)
-                cover = self.translator.blank_image(x=img.size[0], y=img.size[1]//3, opacity=255)
+                cover = self.translator.blank_image(
+                    x=img.size[0], y=img.size[1] // 3, opacity=255
+                )
                 img.paste(cover, (0, 0))
             return overlay(ind_banner, img)
 
@@ -128,10 +153,14 @@ class Blissymbol:
         :return: Image, input image pluralized
         """
         bliss_indicators = self.indicators
-        ind = self.translator.bliss_image(indicator, width=img.size[0], height=img.size[1], whitebg=True)
+        ind = self.translator.bliss_image(
+            indicator, width=img.size[0], height=img.size[1], whitebg=True
+        )
         if len(bliss_indicators) != 0:
             # indicator width = 158
-            blank_img = self.translator.blank_image(x=int(158*1.5*len(bliss_indicators)), y=img.size[1], opacity=0)
+            blank_img = self.translator.blank_image(
+                x=int(158 * 1.5 * len(bliss_indicators)), y=img.size[1], opacity=0
+            )
             ind = self.translator.beside(blank_img, ind)
         return overlay(ind, img)
 
@@ -213,7 +242,9 @@ class Blissymbol:
             for derivation in self.derivation:
                 deriv_bliss = self.translator.blissword_to_blissymbol(derivation)
 
-                if deriv_bliss is None:  # if derivation has no characters, return this Blissymbol
+                if (
+                    deriv_bliss is None
+                ):  # if derivation has no characters, return this Blissymbol
                     bliss_derivatives.append(deriv_bliss)
                     return bliss_derivatives
                 elif self == deriv_bliss or deriv_bliss in bliss_derivatives:
@@ -310,7 +341,9 @@ class Blissymbol:
         """
         self.translations.setdefault(language, [])
         self.translations[language].append(translation)
-        self.translations[language] = self.translator.remove_duplicates(self.translations[language])
+        self.translations[language] = self.translator.remove_duplicates(
+            self.translations[language]
+        )
 
     def add_translations(self, language, translations):
         """
@@ -439,7 +472,10 @@ class Blissymbol:
             val (List[str]) - cleaned Blissymbol translations in language
         """
         languages = translations
-        translations = {language: self.clean_translation(translations[language]) for language in languages}
+        translations = {
+            language: self.clean_translation(translations[language])
+            for language in languages
+        }
         return translations
 
     def get_pos(self):
@@ -540,7 +576,9 @@ class Blissymbol:
 
         :return: List[str], this Blissymbol's derivations' unicode IDs
         """
-        return [self.unicode] if self.is_atomic else self.find_deriv_unicode(atomic=atomic)
+        return (
+            [self.unicode] if self.is_atomic else self.find_deriv_unicode(atomic=atomic)
+        )
 
     def derivation_bci_nums(self, atomic=True):
         """
@@ -548,7 +586,11 @@ class Blissymbol:
 
         :return: List[int], this Blissymbol's derivations' BCI-AV#s
         """
-        return [self.bci_num] if self.is_atomic else self.find_deriv_bci_nums(atomic=atomic)
+        return (
+            [self.bci_num]
+            if self.is_atomic
+            else self.find_deriv_bci_nums(atomic=atomic)
+        )
 
     def derivations_synonyms(self, derivations):
         """
@@ -669,7 +711,9 @@ class Blissymbol:
                     lang_code = self.translator.find_lang_code(lang)
 
                     for defn in translation:
-                        synset = self.translator.word_synsets(defn, pos, lang_code=lang_code)
+                        synset = self.translator.word_synsets(
+                            defn, pos, lang_code=lang_code
+                        )
                         if synset is None:
                             lang = False
                             break
@@ -712,22 +756,26 @@ class Blissymbol:
         return hash(self.bliss_name)
 
     def __str__(self):
-        return 'Blissymbol("{0}", {1}, {2}, {3}, {4}, {5})'.format(self.bliss_name,
-                                                                   self.pos,
-                                                                   self.derivation,
-                                                                   self.translations,
-                                                                   "self.translator",
-                                                                   self.bci_num)
+        return 'Blissymbol("{0}", {1}, {2}, {3}, {4}, {5})'.format(
+            self.bliss_name,
+            self.pos,
+            self.derivation,
+            self.translations,
+            "self.translator",
+            self.bci_num,
+        )
 
     def __int__(self):
         return int(self.bci_num)
 
     def __dict__(self):
-        return {"name": self.bliss_name,
-                "pos": self.get_pos(),
-                "BCI-AV": self.bci_num,
-                "derivation": self.derivation,
-                "translations": self.translations}
+        return {
+            "name": self.bliss_name,
+            "pos": self.get_pos(),
+            "BCI-AV": self.bci_num,
+            "derivation": self.derivation,
+            "translations": self.translations,
+        }
 
     __repr__ = __str__
 
@@ -736,10 +784,11 @@ class BlissAlphabet:
     """
     A class for holding BlissGlyph elements.
     """
+
     def __init__(self):
         pass
-        #self.lex_parser = LexiconParser()
-        #self.bliss_atoms = self.lex_parser.init_blissymbols()
+        # self.lex_parser = LexiconParser()
+        # self.bliss_atoms = self.lex_parser.init_blissymbols()
 
 
 class BlissIndicator:
@@ -750,14 +799,12 @@ class BlissIndicator:
         "plural noun": "indicator_(things)",
         "adverb": "indicator_(adverb)",
         "plural": "indicator_(plural)",
-
         # NOUNS
         # --> definiteness
         "definite": "indicator_(definite_form)",
         "indefinite": "indicator_(indefinite_form)",
         # --> possession
         "possessive": "indicator_(possessive_form)",
-
         # VERBS
         # --> grammatical forms
         "imperative": "indicator_(imperative_form)",
@@ -783,12 +830,10 @@ class BlissIndicator:
         # --> participles
         "past participle": "indicator_(past_participle_1)",
         "present participle": "indicator_(present_participle)",
-
         # ADJECTIVES
         # "": "indicator_(description_before_fact)",
         "adjective": "indicator_(description)",
         # "": "indicator_(description_after_fact)",
-
         # ASPECTS
         # --> person
         "first person": "indicator_(first_person)",
@@ -799,9 +844,8 @@ class BlissIndicator:
         "feminine": "indicator_(female)",
         "neutral": "indicator_(neutral_form)",
         "object": "indicator_(object_form)",
-
         # BLISS-SPECIFIC
-        "combination": "indicator_(combine)"
+        "combination": "indicator_(combine)",
     }
 
 
@@ -816,27 +860,36 @@ class BlissGlyph:
     ~
     The first element of middle_zones defines the main BLISS_UNIT.
     """
-    HEIGHTS = {0: "descender limit",
-               1: "earthline",
-               2: "middle earth line",
-               3: "midline",
-               4: "middle sky line",
-               5: "skyline",
-               6: "indicator limit",
-               7: "tall indicator limit"}
-    GLYPH_HEIGHT = len(HEIGHTS)
-    ZONE_HEIGHTS = 2    # each zone takes up 2x2 blocks
-    UNIT_WIDTH = 4      # each atomic Blissymbol takes up 4 width units
 
-    def __init__(self, bliss_unit=list(), sky_zones=list(),
-                 middle_zones=list(), earth_zones=list(),
-                 ultra_zones=list(), infra_zones=list()):
-        self.bliss_unit = bliss_unit        # takes up sky/middle/earth zone
-        self.ultra_zones = ultra_zones      # holds indicators
+    HEIGHTS = {
+        0: "descender limit",
+        1: "earthline",
+        2: "middle earth line",
+        3: "midline",
+        4: "middle sky line",
+        5: "skyline",
+        6: "indicator limit",
+        7: "tall indicator limit",
+    }
+    GLYPH_HEIGHT = len(HEIGHTS)
+    ZONE_HEIGHTS = 2  # each zone takes up 2x2 blocks
+    UNIT_WIDTH = 4  # each atomic Blissymbol takes up 4 width units
+
+    def __init__(
+        self,
+        bliss_unit=list(),
+        sky_zones=list(),
+        middle_zones=list(),
+        earth_zones=list(),
+        ultra_zones=list(),
+        infra_zones=list(),
+    ):
+        self.bliss_unit = bliss_unit  # takes up sky/middle/earth zone
+        self.ultra_zones = ultra_zones  # holds indicators
         self.sky_zones = sky_zones
         self.middle_zones = middle_zones
         self.earth_zones = earth_zones
-        self.infra_zones = infra_zones      # holds descenders
+        self.infra_zones = infra_zones  # holds descenders
 
     def set_bliss_unit(self, bliss_unit):
         self.bliss_unit = bliss_unit

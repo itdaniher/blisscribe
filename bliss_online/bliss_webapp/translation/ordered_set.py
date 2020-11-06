@@ -8,6 +8,7 @@ class OrderedSet:
 
     :param items: List[X], items to create ordered set for
     """
+
     def __init__(self, items=list()):
         self.items_set = set(items)
         self.all_items = list(items)
@@ -88,8 +89,12 @@ class OrderedSet:
             items = self.all_items
         items_set = self.remove_duplicates(items)
         counts = self.frequency_counts()
-        items_set = [i for i in items_set if (min_ct is None or counts.get(i, 0) > min_ct) and
-                     (max_ct is None or counts.get(i, 0) < max_ct)]
+        items_set = [
+            i
+            for i in items_set
+            if (min_ct is None or counts.get(i, 0) > min_ct)
+            and (max_ct is None or counts.get(i, 0) < max_ct)
+        ]
         return sorted(items_set, key=lambda i: counts[i], reverse=True)
 
     def rank_items(self, items=None):
@@ -171,7 +176,7 @@ class OrderedSet:
         :return: List[X], items in OrderedSet occurring the most
         """
         counts = self.frequency_counts()
-        min_i = kwargs.get('min_i', None)
+        min_i = kwargs.get("min_i", None)
         if min_i is None:
             min_i = max(counts.values()) if len(counts) != 0 else 0
         items = self.remove_duplicates(self.all_items)
@@ -222,14 +227,12 @@ class OrderedSet:
     def __getitem__(self, index):
         return self.items()[index]
 
-    #def __str__(self):
+    # def __str__(self):
     #    return str(self.items())
 
-    #def __repr__(self):
+    # def __repr__(self):
     #    return str(self)
 
     def __add__(self, other):
         self.update(other)
         return self
-
-

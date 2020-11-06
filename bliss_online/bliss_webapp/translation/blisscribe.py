@@ -4,25 +4,28 @@ BLISSCRIBE:
     A Python module for translating text to Blissymbols.
 """
 import os, sys
+
 PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(PATH)
 import collections
 import nltk
-nltk.download('wordnet', quiet=True)
-nltk.download('averaged_perceptron_tagger', quiet=True)
+
+nltk.download("wordnet", quiet=True)
+nltk.download("averaged_perceptron_tagger", quiet=True)
 from nltk.tag import pos_tag
 from nltk.corpus import wordnet
 from fpdf import FPDF
 from imports import safe_import
-safe_import('fonts')
-safe_import('punctuation')
-safe_import('parts_of_speech')
-safe_import('images')
-safe_import('lexicon_parser')
-safe_import('translation_word')
-safe_import('speechart')
-safe_import('ordered_set')
-safe_import('blisslearn')
+
+safe_import("fonts")
+safe_import("punctuation")
+safe_import("parts_of_speech")
+safe_import("images")
+safe_import("lexicon_parser")
+safe_import("translation_word")
+safe_import("speechart")
+safe_import("ordered_set")
+safe_import("blisslearn")
 from blisslearn import BlissClassifier
 from fonts import *
 from punctuation import *
@@ -33,6 +36,7 @@ from translation_word import TranslationWord
 from speechart.language_parser import LanguageParser
 import speechart.tokenizers as tokenizers
 from ordered_set import OrderedSet
+
 # NOTE: deprecating pattern3 until IndentationError patched
 # from pattern3 import text
 # from pattern3.text import en, es, fr, de, it, nl
@@ -73,6 +77,7 @@ class BlissTranslator:
            new Blissymbols
            --> set_sub_all()
     """
+
     DEFAULT_LANG = "English"
     WIDTH = 816
     HEIGHT = 1056
@@ -163,7 +168,9 @@ class BlissTranslator:
         """
         self.bliss_dicts.setdefault(self.language, {})
         self.bliss_dicts.setdefault("English", {})
-        self.bliss_dicts[self.language] = self.lex_parser.init_bliss_lexicon(self.language)
+        self.bliss_dicts[self.language] = self.lex_parser.init_bliss_lexicon(
+            self.language
+        )
         if self.language != "English":
             self.bliss_dicts["English"] = self.lex_parser.init_bliss_lexicon("English")
             self.load_multilingual_lemmas(self.lang_code())
@@ -251,10 +258,10 @@ class BlissTranslator:
         :return: str, Blissymbol name for uni / unicode for bliss name
         """
         bliss_unicode = self.bliss_unicode
-        uni = kwargs.get('uni', None)
+        uni = kwargs.get("uni", None)
         if uni is not None:
             return bliss_unicode.get(uni, None)
-        bliss = kwargs.get('bliss', None)
+        bliss = kwargs.get("bliss", None)
         if bliss is not None:
             uni_bliss = {bliss_unicode[b]: b for b in bliss_unicode}
             return uni_bliss.get(bliss, None)
@@ -397,9 +404,9 @@ class BlissTranslator:
 
         :return: Image, image of input str's Blissymbol
         """
-        width = kwargs.get('width', None)
-        height = kwargs.get('height', None)
-        whitebg = kwargs.get('whitebg', False)
+        width = kwargs.get("width", None)
+        height = kwargs.get("height", None)
+        whitebg = kwargs.get("whitebg", False)
 
         img = Image.open(IMG_PATH + bliss_name + ".png")
         if width is not None or height is not None:
@@ -445,7 +452,12 @@ class BlissTranslator:
         :return: Image, title page
         """
         img = blank_image(x, y)
-        title_img = word_image(title, self.image_heights(), font_path=self.font_path, font_size=self.font_size)
+        title_img = word_image(
+            title,
+            self.image_heights(),
+            font_path=self.font_path,
+            font_size=self.font_size,
+        )
         img_x = x // 2 - title_img.size[0] // 2
         img_y = y // 3
         img.paste(title_img, (img_x, img_y))
@@ -468,7 +480,7 @@ class BlissTranslator:
         """
         filenames = []
         for i in range(len(pages)):
-            filename = 'bliss_img' + str(i) + '.png'
+            filename = "bliss_img" + str(i) + ".png"
             pages[i].save(filename)
             filenames.append(filename)
         width, height = Image.open(filenames[0]).size
@@ -482,8 +494,14 @@ class BlissTranslator:
             pdf.image(filename, x=margins, y=margins)
 
             if idx > 1 and page_nums:
-                number = trim(word_image(str(idx), self.image_heights(),
-                                         font_path=self.font_path, font_size=self.font_size))
+                number = trim(
+                    word_image(
+                        str(idx),
+                        self.image_heights(),
+                        font_path=self.font_path,
+                        font_size=self.font_size,
+                    )
+                )
                 num_filename = str(idx) + ".png"
                 number.save(num_filename)
                 x = new_w // 2 - number.size[0]
@@ -543,11 +561,13 @@ class BlissTranslator:
 
         :return: Set(str), languages supported in Blissymbols and WordNet
         """
-        return WORDNET_SUPPORTED_LANGS.intersection({LANG_CODES.get(b, None) for b in BLISS_SUPPORTED_LANGS})
-        #supported_langs = self.lex_parser.BLISS_LANGS.intersection(self.wordnet_langs())
-        #pattern_langs = text.LANGUAGES
-        #supported_langs.update(pattern_langs)
-        #return supported_langs
+        return WORDNET_SUPPORTED_LANGS.intersection(
+            {LANG_CODES.get(b, None) for b in BLISS_SUPPORTED_LANGS}
+        )
+        # supported_langs = self.lex_parser.BLISS_LANGS.intersection(self.wordnet_langs())
+        # pattern_langs = text.LANGUAGES
+        # supported_langs.update(pattern_langs)
+        # return supported_langs
 
     def load_multilingual_lemmas(self, lang_code):
         """
@@ -565,7 +585,7 @@ class BlissTranslator:
 
             if tab_file is not None:
                 wordnet.custom_lemmas(tab_file, lang_code)
-            #else:
+            # else:
             #    raise ValueError("Blisscribe doesn't support this language yet... oops!")
 
     # LANGUAGE PROCESSING
@@ -706,13 +726,13 @@ class BlissTranslator:
         """
         if type(pos) == str:
             if self.is_noun(pos):
-                return 'n'
+                return "n"
             elif self.is_verb(pos):
-                return 'v'
+                return "v"
             elif self.is_adj(pos):
-                return 'a'
+                return "a"
             elif self.is_adv(pos):
-                return 'r'
+                return "r"
             else:
                 return
         elif len(pos) != 0:
@@ -760,9 +780,13 @@ class BlissTranslator:
         :return: str, plural noun singularized
         """
         if pos == "NNS":
-            return self.lang_parser.find_custom_lemma(noun, lang, 'Noun', 'plural', add_new=True)
+            return self.lang_parser.find_custom_lemma(
+                noun, lang, "Noun", "plural", add_new=True
+            )
         elif pos == "NNPS":
-            return self.lang_parser.find_custom_lemma(noun, lang, 'Proper noun', 'plural', add_new=True)
+            return self.lang_parser.find_custom_lemma(
+                noun, lang, "Proper noun", "plural", add_new=True
+            )
 
     def infinitive(self, verb, lang, pos):
         """
@@ -780,22 +804,35 @@ class BlissTranslator:
         if pos == "VB":
             return verb
         elif pos == "VBD":
-            return self.lang_parser.find_custom_lemma(verb, lang, 'Verb', 'past tense', add_new=True)
+            return self.lang_parser.find_custom_lemma(
+                verb, lang, "Verb", "past tense", add_new=True
+            )
         elif pos == "VBG":
-            return self.lang_parser.find_custom_lemma(verb, lang, 'Verb', 'present participle', add_new=True)
+            return self.lang_parser.find_custom_lemma(
+                verb, lang, "Verb", "present participle", add_new=True
+            )
         elif pos == "VBN":
-            return self.lang_parser.find_custom_lemma(verb, lang, 'Verb', 'past participle', add_new=True)
+            return self.lang_parser.find_custom_lemma(
+                verb, lang, "Verb", "past participle", add_new=True
+            )
         elif pos == "VBP":
-            person1 = self.lang_parser.find_custom_lemma(verb, lang, 'Verb', ['singular present', 'first-person'],
-                                                         add_new=True)
+            person1 = self.lang_parser.find_custom_lemma(
+                verb, lang, "Verb", ["singular present", "first-person"], add_new=True
+            )
             if person1 is not None:
                 return person1
             else:
-                return self.lang_parser.find_custom_lemma(verb, lang, 'Verb', ['singular present', 'second-person'],
-                                                          add_new=True)
+                return self.lang_parser.find_custom_lemma(
+                    verb,
+                    lang,
+                    "Verb",
+                    ["singular present", "second-person"],
+                    add_new=True,
+                )
         elif pos == "VBZ":
-            return self.lang_parser.find_custom_lemma(verb, lang, 'Verb', ['singular present', 'third-person'],
-                                                         add_new=True)
+            return self.lang_parser.find_custom_lemma(
+                verb, lang, "Verb", ["singular present", "third-person"], add_new=True
+            )
         else:
             return
 
@@ -818,15 +855,23 @@ class BlissTranslator:
         if pos == "JJ":
             return adjv
         elif pos == "JJR":
-            return self.lang_parser.find_custom_lemma(adjv, lang, pos='Adjective', defn_phrase="comparative")
+            return self.lang_parser.find_custom_lemma(
+                adjv, lang, pos="Adjective", defn_phrase="comparative"
+            )
         elif pos == "JJS":
-            return self.lang_parser.find_custom_lemma(adjv, lang, pos='Adjective', defn_phrase="superlative")
+            return self.lang_parser.find_custom_lemma(
+                adjv, lang, pos="Adjective", defn_phrase="superlative"
+            )
         elif pos == "RB":
-            return self.lang_parser.find_custom_lemma(adjv, lang, pos='Adverb')
+            return self.lang_parser.find_custom_lemma(adjv, lang, pos="Adverb")
         elif pos == "RBR":
-            return self.lang_parser.find_custom_lemma(adjv, lang, pos='Adverb', defn_phrase="comparative")
+            return self.lang_parser.find_custom_lemma(
+                adjv, lang, pos="Adverb", defn_phrase="comparative"
+            )
         elif pos == "RBS":
-            return self.lang_parser.find_custom_lemma(adjv, lang, pos='Adverb', defn_phrase="superlative")
+            return self.lang_parser.find_custom_lemma(
+                adjv, lang, pos="Adverb", defn_phrase="superlative"
+            )
 
     def is_noun(self, pos):
         """
@@ -1022,7 +1067,10 @@ class BlissTranslator:
         :param word: str, word to see if punctuation or whitespace
         :return: bool, whether word is punctuation or whitespace
         """
-        return not (self.is_whitespace(word) or self.is_punctuation(word)) and len(word) != 0
+        return (
+            not (self.is_whitespace(word) or self.is_punctuation(word))
+            and len(word) != 0
+        )
 
     def is_bliss_word(self, word):
         """
@@ -1053,12 +1101,12 @@ class BlissTranslator:
 
         :return: bool, whether word is in eng_bliss_dict
         """
-        synset = kwargs.get('synset', None)
+        synset = kwargs.get("synset", None)
         if synset is not None:
             return any(synset.name() in v for v in self.blissnet.values())
-        bci_num = kwargs.get('bci_num', None)
+        bci_num = kwargs.get("bci_num", None)
         if bci_num is None:
-            blissymbol = kwargs.get('blissymbol', None)
+            blissymbol = kwargs.get("blissymbol", None)
             if blissymbol is not None:
                 bci_num = blissymbol.bci_num
             else:
@@ -1083,10 +1131,14 @@ class BlissTranslator:
             for bci_num in BCI_BLISSNET:
                 synsets = BCI_BLISSNET[bci_num]
                 if synset.name() in synsets:
-                    curr_match = 1/len(synsets)
+                    curr_match = 1 / len(synsets)
                     if curr_match > match:
                         bliss_num, match = bci_num, curr_match
-            return self.bci_num_to_blissymbol(int(bliss_num)) if bliss_num is not None else None
+            return (
+                self.bci_num_to_blissymbol(int(bliss_num))
+                if bliss_num is not None
+                else None
+            )
         else:
             bci_num = kwargs.get("bci_num", None)
             if bci_num is None:
@@ -1179,8 +1231,8 @@ class BlissTranslator:
             elif char in ends:
                 num_starts -= 1
                 if num_starts == 0:
-                    if idx+2 < len(word):
-                        stripped = word[:start_idx] + word[idx+1:]
+                    if idx + 2 < len(word):
+                        stripped = word[:start_idx] + word[idx + 1 :]
                     else:
                         stripped = word[:start_idx]
                     stripped = stripped.strip()
@@ -1215,7 +1267,9 @@ class BlissTranslator:
             pos = set(PARTS_OF_SPEECH)
 
         def in_bliss_dict(w):
-            if w in bliss_dict and any(self.pos_match(pos, b.pos) for b in bliss_dict[w]):
+            if w in bliss_dict and any(
+                self.pos_match(pos, b.pos) for b in bliss_dict[w]
+            ):
                 return w
             else:
                 return None
@@ -1239,7 +1293,7 @@ class BlissTranslator:
             del word_entry
 
         del bliss_dict
-        '''
+        """
         if pos is None or self.is_noun(pos):
             singular = self.singularize(word, lang)
             if singular is not None:
@@ -1260,7 +1314,7 @@ class BlissTranslator:
                 return predicative
             else:
                 del predicative
-        '''
+        """
 
         if lang[:3] == "Eng":
             pos_abbrev = self.abbreviate_pos(pos)
@@ -1275,7 +1329,9 @@ class BlissTranslator:
                 wikt_pos = self.convert_pos_to_wikt(pos)
             else:
                 wikt_pos = None
-            return self.lang_parser.lemmatize(word, lang=lang, pos=wikt_pos, add_new=True)
+            return self.lang_parser.lemmatize(
+                word, lang=lang, pos=wikt_pos, add_new=True
+            )
 
     def lemmatize_multilingual(self, word, lang, pos=None):
         """
@@ -1322,9 +1378,12 @@ class BlissTranslator:
                     return entry[0]
                 else:
                     poses = self.convert_pos_to_wikt(pos) if pos is not None else None
-                    multilemmas = [self.lang_parser.lemmatize_multilingual(lemma, lang, poses,
-                                                                           add_new=lemma not in self.words_seen)
-                                   for lemma in entry]
+                    multilemmas = [
+                        self.lang_parser.lemmatize_multilingual(
+                            lemma, lang, poses, add_new=lemma not in self.words_seen
+                        )
+                        for lemma in entry
+                    ]
                     lemmas = OrderedSet(multilemmas).intersections()
                     if len(lemmas) != 0:
                         entry = lemmas
@@ -1372,12 +1431,14 @@ class BlissTranslator:
             translations = {}
         translations.setdefault(self.language, [])
         translations["English"] = [name for name in bliss_name[:-4].split(",")]
-        return Blissymbol(bliss_name=bliss_name,
-                          pos=pos,
-                          derivation=derivation,
-                          translations=translations,
-                          translator=self,
-                          num=num)
+        return Blissymbol(
+            bliss_name=bliss_name,
+            pos=pos,
+            derivation=derivation,
+            translations=translations,
+            translator=self,
+            num=num,
+        )
 
     def word_bliss_name(self, word, language="English"):
         """
@@ -1414,8 +1475,14 @@ class BlissTranslator:
             blissymbols = self.lookup_bliss_dict(word, lang)
 
             if pos is not None and blissymbols is not None:
-                pos_match = lambda p, b: p in b.pos if type(p) == str else any(s in b.pos for s in pos)
-                filtered_bliss = [bliss for bliss in blissymbols if pos_match(pos, bliss)]
+                pos_match = (
+                    lambda p, b: p in b.pos
+                    if type(p) == str
+                    else any(s in b.pos for s in pos)
+                )
+                filtered_bliss = [
+                    bliss for bliss in blissymbols if pos_match(pos, bliss)
+                ]
                 if len(filtered_bliss) != 0:
                     blissymbols = filtered_bliss
 
@@ -1460,8 +1527,11 @@ class BlissTranslator:
             entry = self.lookup_bliss_dict(word, lang)
             if entry is not None:
                 if pos is not None:
-                    matches_pos = lambda p, b: (p in b.pos) or (p[:2] in b.pos) if type(p) == str else \
-                        any((p_ in b.pos) or (p_[:2] in b.pos) for p_ in p)
+                    matches_pos = (
+                        lambda p, b: (p in b.pos) or (p[:2] in b.pos)
+                        if type(p) == str
+                        else any((p_ in b.pos) or (p_[:2] in b.pos) for p_ in p)
+                    )
                     entry = {bliss for bliss in entry if matches_pos(pos, bliss)}
                 blissymbols.update(entry)
 
@@ -1478,7 +1548,9 @@ class BlissTranslator:
         :return: Blissymbol, a Blissymbol for this synset
         """
         lemmas = self.synset_lemmas(synset, eng=False)
-        return self.words_to_blissymbol(lemmas, lang=language, pos=self.synset_pos(synset))
+        return self.words_to_blissymbol(
+            lemmas, lang=language, pos=self.synset_pos(synset)
+        )
 
     def synsets_to_blissymbol(self, synsets):
         """
@@ -1541,7 +1613,9 @@ class BlissTranslator:
                 translations = bliss_translations[language]
                 lang_code = self.find_lang_code(language)
                 if len(translations) != 0:
-                    word_synsets = self.words_synsets(translations, lang_code=lang_code, pos=blissymbol.get_pos())
+                    word_synsets = self.words_synsets(
+                        translations, lang_code=lang_code, pos=blissymbol.get_pos()
+                    )
                     synsets.update(word_synsets)
 
         return synsets.intersections()
@@ -1789,7 +1863,12 @@ class BlissTranslator:
         translatable_synsets = []
 
         for synset in synsets:
-            if any([self.in_bliss_dict(lemma, self.language) for lemma in self.synset_lemmas(synset)]):
+            if any(
+                [
+                    self.in_bliss_dict(lemma, self.language)
+                    for lemma in self.synset_lemmas(synset)
+                ]
+            ):
                 translatable_synsets.append(synset)
 
         return translatable_synsets
@@ -1877,7 +1956,9 @@ class BlissTranslator:
         """
         kwargs = self._setdefault_kwargs(**kwargs)
         pages = self.translate_to_pages(phrase, **kwargs)
-        pdf = self.get_pdf(kwargs['title'], pages, margins=50, page_nums=kwargs['page_nums'])
+        pdf = self.get_pdf(
+            kwargs["title"], pages, margins=50, page_nums=kwargs["page_nums"]
+        )
         self.refresh_data()
         return pdf
 
@@ -1902,12 +1983,12 @@ class BlissTranslator:
         :return: List[Image], pages of phrase translated to Blissymbols
         """
         kwargs = self._setdefault_kwargs(**kwargs)
-        img_w, img_h = kwargs['width'], kwargs['height']
+        img_w, img_h = kwargs["width"], kwargs["height"]
         images = self.translate_to_images(phrase, **kwargs)
         pages = self.images_to_pages(images, img_w, img_h)
 
-        if kwargs['title_pg']:
-            title_pg = self.title_page(kwargs['title'], img_w, img_h)
+        if kwargs["title_pg"]:
+            title_pg = self.title_page(kwargs["title"], img_w, img_h)
             pages.insert(0, title_pg)
 
         return pages
@@ -1921,16 +2002,28 @@ class BlissTranslator:
         :return: List[TranslationWord], TWs for each word in phrase
         """
         kwargs = self._setdefault_kwargs(**kwargs)
-        lang = kwargs['lang']
+        lang = kwargs["lang"]
         word_tags = self.tokenize_pos_tag(phrase, lang)
-        return [self.translation_word(word_tag[0].lower() if self.in_bliss_dict(word_tag[0].lower(), lang)
-                                      else word_tag[0], word_tag[1], lang) if self.is_word(word_tag[0])
-                else word_tag[0] for word_tag in word_tags]
+        return [
+            self.translation_word(
+                word_tag[0].lower()
+                if self.in_bliss_dict(word_tag[0].lower(), lang)
+                else word_tag[0],
+                word_tag[1],
+                lang,
+            )
+            if self.is_word(word_tag[0])
+            else word_tag[0]
+            for word_tag in word_tags
+        ]
 
     def find_lemmas(self, word, pos, lang):
         wikt_pos = self.convert_pos_to_wikt(pos)
-        return self.lang_parser.find_lemmas(word, wikt_pos[0] if wikt_pos is not None and len(wikt_pos) != 0 else None,
-                                            lang)
+        return self.lang_parser.find_lemmas(
+            word,
+            wikt_pos[0] if wikt_pos is not None and len(wikt_pos) != 0 else None,
+            lang,
+        )
 
     def find_english_translations(self, word, pos, lang):
         wikt_pos = self.convert_pos_to_wikt(pos) if pos is not None else None
@@ -1953,7 +2046,10 @@ class BlissTranslator:
         if lang[:3] == "Eng":
             return token_pos_tags
         else:
-            return [(w, max(self.word_poses(w, lang), [p], key=len)) for w, p in token_pos_tags]
+            return [
+                (w, max(self.word_poses(w, lang), [p], key=len))
+                for w, p in token_pos_tags
+            ]
 
     def translate_to_images(self, phrase, **kwargs):
         """
@@ -1978,7 +2074,7 @@ class BlissTranslator:
                 if lemma == "\n":
                     imgs.append(None)
                 else:
-                    subs = kwargs['sub_all'] or not self.is_changed(lemma)
+                    subs = kwargs["sub_all"] or not self.is_changed(lemma)
                     self.add_changed(lemma) if subs else self.add_seen(lemma)
                     img = trans_word.image(subs=subs)
                     imgs.append(img)
@@ -2035,11 +2131,13 @@ class BlissTranslator:
             pages = []
             new_page = lambda: blank_image(0, 0)
             line1 = lines[0]
-            fill_page = lambda p: above(p, blank_image(line1.size[0], h - line1.size[1]))
+            fill_page = lambda p: above(
+                p, blank_image(line1.size[0], h - line1.size[1])
+            )
             page = new_page()
 
             y = 0
-            inc_y = lambda: y + int(self.image_heights()*1.5)
+            inc_y = lambda: y + int(self.image_heights() * 1.5)
 
             for line in lines:
                 if line is None:
@@ -2082,7 +2180,7 @@ class BlissTranslator:
 
         x, y = indent, 0
         inc_x = lambda img: x + img.size[0] + space
-        inc_y = lambda: y + int(self.image_heights()*1.5)
+        inc_y = lambda: y + int(self.image_heights() * 1.5)
 
         for image in images:
             if image is None:
@@ -2148,15 +2246,16 @@ class BlissTranslator:
         return concept_freqs
 
     def _setdefault_kwargs(self, **kwargs):
-        kwargs.setdefault('title', 'translation')
-        kwargs.setdefault('title_pg', False)
-        kwargs.setdefault('page_nums', False)
-        kwargs.setdefault('width', self.WIDTH)
-        kwargs.setdefault('height', self.HEIGHT)
-        kwargs.setdefault('sub_all', True)
-        kwargs.setdefault('machine_learn', False)
-        kwargs.setdefault('fast', True)
-        kwargs.setdefault('lang', self.language)
-        kwargs.setdefault('pos', PARTS_OF_SPEECH)  # set of desired parts of speech to translate
+        kwargs.setdefault("title", "translation")
+        kwargs.setdefault("title_pg", False)
+        kwargs.setdefault("page_nums", False)
+        kwargs.setdefault("width", self.WIDTH)
+        kwargs.setdefault("height", self.HEIGHT)
+        kwargs.setdefault("sub_all", True)
+        kwargs.setdefault("machine_learn", False)
+        kwargs.setdefault("fast", True)
+        kwargs.setdefault("lang", self.language)
+        kwargs.setdefault(
+            "pos", PARTS_OF_SPEECH
+        )  # set of desired parts of speech to translate
         return kwargs
-

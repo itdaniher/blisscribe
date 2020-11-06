@@ -17,6 +17,7 @@ BLISSLEARN:
         - official Blissymbol derived vocabulary
 """
 import os
+
 try:
     import sklearn
 except ImportError:
@@ -31,6 +32,7 @@ class BlissClassifier:
     """
     A machine learning classifier for Blissymbols.
     """
+
     PATH = os.path.dirname(os.path.realpath(__file__))
 
     def __init__(self, bliss_translator):
@@ -82,7 +84,10 @@ class BlissClassifier:
 
                     if len(intersection) != 0:
                         self.add_question_answer(word_features, bci_nums)  # bci_num
-                    elif word_features not in test_questions and word_features not in self.questions:
+                    elif (
+                        word_features not in test_questions
+                        and word_features not in self.questions
+                    ):
                         test_questions.append(word_features)
                         test_answers.append(bci_nums)  # bci_num
 
@@ -100,7 +105,7 @@ class BlissClassifier:
         print("")
         print("trained with " + str(len(self.questions)) + " question-answer sets")
         print("tested with " + str(len(test_questions)) + " question-answer sets")
-        print("word coverage: " + str(len(self.questions)/float(len(samples))))
+        print("word coverage: " + str(len(self.questions) / float(len(samples))))
         print("")
 
         self.train_classifier(test_questions, test_answers)
@@ -145,7 +150,10 @@ class BlissClassifier:
 
                     if len(intersection) != 0:
                         self.add_question_answer(word_features, uni)
-                    elif word_features not in test_questions and word_features not in self.questions:
+                    elif (
+                        word_features not in test_questions
+                        and word_features not in self.questions
+                    ):
                         test_questions.append(word_features)
                         test_answers.append(uni)
 
@@ -163,7 +171,7 @@ class BlissClassifier:
         print("")
         print("trained with " + str(len(self.questions)) + " question-answer sets")
         print("tested with " + str(len(test_questions)) + " question-answer sets")
-        print("word coverage: " + str(len(self.questions)/float(len(samples))))
+        print("word coverage: " + str(len(self.questions) / float(len(samples))))
         print("")
 
         self.train_classifier(test_questions, test_answers)
@@ -184,11 +192,25 @@ class BlissClassifier:
                 q_word = self.find_id_synsets(qa[0][0])[0]
                 q_pos = self.int_to_pos(qa[0][1])
 
-                ans_desc = ("/".join(self.translator.lookup_bliss_unicode(uni=self.hex_to_unicode(ans)))
-                            for ans in qa[1].split(" "))
+                ans_desc = (
+                    "/".join(
+                        self.translator.lookup_bliss_unicode(
+                            uni=self.hex_to_unicode(ans)
+                        )
+                    )
+                    for ans in qa[1].split(" ")
+                )
                 ans_desc = " + ".join(ans_desc)
 
-                examples.write("# " + str(q_word[0]) + ", " + str(q_pos) + " -> " + str(ans_desc) + "\n")
+                examples.write(
+                    "# "
+                    + str(q_word[0])
+                    + ", "
+                    + str(q_pos)
+                    + " -> "
+                    + str(ans_desc)
+                    + "\n"
+                )
                 examples.write(str(qa) + "\n\n")
 
             examples.close()
@@ -202,7 +224,10 @@ class BlissClassifier:
         :param cap: int, maximum number of common words to output
         :return: Set(str), most common words in English
         """
-        path = self.translator.PATH + "/speechart/resources/frequency_words/content/2016/en/en_50k.txt"
+        path = (
+            self.translator.PATH
+            + "/speechart/resources/frequency_words/content/2016/en/en_50k.txt"
+        )
         with open(path, "r") as words:
             common_words = set()
             idx = 0
@@ -287,11 +312,24 @@ class BlissClassifier:
         self.test_results(all)
 
         print("")
-        print("number on-target: " + str(len(test_questions) - len(misses)) + " out of " + str(len(test_questions)))
-        print("percent on-target: " + str(float(len(test_questions) - len(misses))/len(test_questions) * 100) + "%")
+        print(
+            "number on-target: "
+            + str(len(test_questions) - len(misses))
+            + " out of "
+            + str(len(test_questions))
+        )
+        print(
+            "percent on-target: "
+            + str(float(len(test_questions) - len(misses)) / len(test_questions) * 100)
+            + "%"
+        )
         print("")
         print("partly on-target: " + str(unicode_hits) + " out of " + str(all_unicodes))
-        print("percent pt on-target: " + str(float(unicode_hits)/all_unicodes * 100) + "%")
+        print(
+            "percent pt on-target: "
+            + str(float(unicode_hits) / all_unicodes * 100)
+            + "%"
+        )
         print("")
 
     def test_results(self, all):
@@ -325,7 +363,11 @@ class BlissClassifier:
 
             q = self.wordnet_indices[q[0]]
             q = q[0][0]
-            print('question:\t{:<30s}\nanswer:  \t{:<40s}\nguess:   \t{:<40s}\n'.format(q, ans, guess))
+            print(
+                "question:\t{:<30s}\nanswer:  \t{:<40s}\nguess:   \t{:<40s}\n".format(
+                    q, ans, guess
+                )
+            )
 
     def unicode_blissword(self, uni):
         """
@@ -438,7 +480,7 @@ class BlissClassifier:
 
                 if id not in index_dict:
                     index_dict[id] = []
-                index_dict[id].append([gloss,pos])
+                index_dict[id].append([gloss, pos])
 
         return index_dict
 
@@ -607,7 +649,7 @@ class BlissClassifier:
         """
         if trans_word.eng_lemma is None:
             return
-            #trans_word.init_eng_lemma(debug=True)
+            # trans_word.init_eng_lemma(debug=True)
 
         lemma = trans_word.eng_lemma
 
@@ -713,15 +755,28 @@ class BlissClassifier:
         return ["U+" + uni for uni in unicodes if uni != ""]
 
     def choose_translation(self, trans_word):
-        ans = input("Enter y to translate " + trans_word.eng_lemma + " to Blissymbols yourself, " +
-                        "or n to choose not to translate it to Blissymbols.\n")
+        ans = input(
+            "Enter y to translate "
+            + trans_word.eng_lemma
+            + " to Blissymbols yourself, "
+            + "or n to choose not to translate it to Blissymbols.\n"
+        )
         if ans == "y":
             trans_word.add_new_derivations()
 
     def verify_translation(self, trans_word, blissymbol):
-        print("I'm about to translate the word " + trans_word.eng_lemma +
-              ", " + trans_word.pos + " with the Blissymbol " + str(blissymbol) + ".  Is that ok?")
-        answer = input("Enter y for yes, n for no.  Enter s to skip to the next Blissymbol.\n")
+        print(
+            "I'm about to translate the word "
+            + trans_word.eng_lemma
+            + ", "
+            + trans_word.pos
+            + " with the Blissymbol "
+            + str(blissymbol)
+            + ".  Is that ok?"
+        )
+        answer = input(
+            "Enter y for yes, n for no.  Enter s to skip to the next Blissymbol.\n"
+        )
 
         if answer == "n":
             self.choose_translation(trans_word)
@@ -729,13 +784,23 @@ class BlissClassifier:
         return trans_word.blissymbol
 
     def verify_translations(self, trans_word, blissymbols):
-        print("I'm about to translate the word " + trans_word.eng_lemma +
-              ", " + trans_word.pos + " with the Blissymbols " + str(blissymbols) + ".  Is that ok?")
+        print(
+            "I'm about to translate the word "
+            + trans_word.eng_lemma
+            + ", "
+            + trans_word.pos
+            + " with the Blissymbols "
+            + str(blissymbols)
+            + ".  Is that ok?"
+        )
         answer = input("Enter y for yes, n for no.\n")
 
         if answer == "n":
             self.choose_translation(trans_word)
-            unicodes = [self.unicode_to_str(bs.unicode) for bs in trans_word.blissymbol.derivation_blissymbols(True)]
+            unicodes = [
+                self.unicode_to_str(bs.unicode)
+                for bs in trans_word.blissymbol.derivation_blissymbols(True)
+            ]
             prediction = " ".join(unicodes)
             return prediction
 

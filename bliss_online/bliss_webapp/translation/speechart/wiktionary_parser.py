@@ -5,6 +5,7 @@ WIKTIONARY_PARSER:
     Contains WiktionaryParser class for parsing Wiktionary entry in any language.
 """
 import os, sys
+
 PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(PATH)
 import re
@@ -12,6 +13,7 @@ import string
 import json
 import requests
 from bs4 import BeautifulSoup
+
 try:
     from bliss_online.bliss_webapp.translation.ordered_set import OrderedSet
 except (ModuleNotFoundError, ImportError):
@@ -23,79 +25,98 @@ class WiktionaryParser:
     """
     A class for parsing Wiktionary pages.
     """
+
     LEXICA = {}
-    LANG_CODES = {"Afrikaans": "af",
-                  "Albanian": "sq",
-                  "Arabic": "ar",
-                  "Armenian": "hy",
-                  "Basque": "eu",
-                  "Bengali": "bn",
-                  "Bosnian": "bs",
-                  "Breton": "br",
-                  "Bulgarian": "bg",
-                  "Catalan": "ca",
-                  "Chinese": "zh",
-                  "Croatian": "hr",
-                  "Danish": "da",
-                  "Dutch": "nl",
-                  "English": "en",
-                  "Esperanto": "eo",
-                  "Georgian": "ka",
-                  "German": "de",
-                  "Greek": "el",
-                  "Finnish": "fi",
-                  "French": "fr",
-                  "Galician": "gl",
-                  "Hebrew": "he",
-                  "Hindi": "hi",
-                  "Hungarian": "hu",
-                  "Icelandic": "is",
-                  "Indonesian": "id",
-                  "Italian": "it",
-                  "Japanese": "ja",
-                  "Kazakh": "kk",
-                  "Korean": "ko",
-                  "Latvian": "lv",
-                  "Lithuanian": "lt",
-                  "Macedonian": "mk",
-                  "Malayan": "ml",
-                  "Malay": "ms",
-                  "Norwegian": "no",
-                  "Persian": "fa",
-                  "Polish": "pl",
-                  "Portuguese": "pt",
-                  "Romanian": "ro",
-                  "Russian": "ru",
-                  "Serbian": "sr",
-                  "Sinhala": "si",
-                  "Slovak": "sk",
-                  "Slovenian": "sl",
-                  "Spanish": "es",
-                  "Swedish": "sv",
-                  "Tamil": "ta",
-                  "Telug": "te",
-                  "Thai": "th",
-                  "Tagalog": "tl",
-                  "Turkish": "tr",
-                  "Ukrainian": "uk",
-                  "Vietnamese": "vi"}
-    PARTS_OF_SPEECH = {"Noun", "Verb", "Adjective", "Adverb",
-                       "Conjunction", "Interjection", "Determiner",
-                       "Preposition", "Postposition",
-                       "Morpheme", "Pronoun", "Proper noun",
-                       "Phrase", "Numeral", "Particle", "Article", "Participle",
-                       "Prefix", "Suffix", "Circumfix", "Interfix", "Infix"}
+    LANG_CODES = {
+        "Afrikaans": "af",
+        "Albanian": "sq",
+        "Arabic": "ar",
+        "Armenian": "hy",
+        "Basque": "eu",
+        "Bengali": "bn",
+        "Bosnian": "bs",
+        "Breton": "br",
+        "Bulgarian": "bg",
+        "Catalan": "ca",
+        "Chinese": "zh",
+        "Croatian": "hr",
+        "Danish": "da",
+        "Dutch": "nl",
+        "English": "en",
+        "Esperanto": "eo",
+        "Georgian": "ka",
+        "German": "de",
+        "Greek": "el",
+        "Finnish": "fi",
+        "French": "fr",
+        "Galician": "gl",
+        "Hebrew": "he",
+        "Hindi": "hi",
+        "Hungarian": "hu",
+        "Icelandic": "is",
+        "Indonesian": "id",
+        "Italian": "it",
+        "Japanese": "ja",
+        "Kazakh": "kk",
+        "Korean": "ko",
+        "Latvian": "lv",
+        "Lithuanian": "lt",
+        "Macedonian": "mk",
+        "Malayan": "ml",
+        "Malay": "ms",
+        "Norwegian": "no",
+        "Persian": "fa",
+        "Polish": "pl",
+        "Portuguese": "pt",
+        "Romanian": "ro",
+        "Russian": "ru",
+        "Serbian": "sr",
+        "Sinhala": "si",
+        "Slovak": "sk",
+        "Slovenian": "sl",
+        "Spanish": "es",
+        "Swedish": "sv",
+        "Tamil": "ta",
+        "Telug": "te",
+        "Thai": "th",
+        "Tagalog": "tl",
+        "Turkish": "tr",
+        "Ukrainian": "uk",
+        "Vietnamese": "vi",
+    }
+    PARTS_OF_SPEECH = {
+        "Noun",
+        "Verb",
+        "Adjective",
+        "Adverb",
+        "Conjunction",
+        "Interjection",
+        "Determiner",
+        "Preposition",
+        "Postposition",
+        "Morpheme",
+        "Pronoun",
+        "Proper noun",
+        "Phrase",
+        "Numeral",
+        "Particle",
+        "Article",
+        "Participle",
+        "Prefix",
+        "Suffix",
+        "Circumfix",
+        "Interfix",
+        "Infix",
+    }
     WIKI_URL = "https://{lang_code}.wiktionary.org"
     ENG_URL = WIKI_URL.format(lang_code="en")
     END_URL = "/w/index.php?title=Category:{lang}"
     BASE_URL = WIKI_URL + "/wiki/{word}#{lang}"
     IPA_PATH = "_terms_with_IPA_pronunciation&from="
     LEMMA_PATH = "_lemmas"
-    HEADER_NAMES = PARTS_OF_SPEECH.union({"Pronunciation",
-                                          "Etymology",
-                                          "Declension",
-                                          "Conjugation",
-                                          "Inflections"})
+    HEADER_NAMES = PARTS_OF_SPEECH.union(
+        {"Pronunciation", "Etymology", "Declension", "Conjugation", "Inflections"}
+    )
 
     def __init__(self):
         self._session = requests.session()
@@ -108,7 +129,7 @@ class WiktionaryParser:
     @property
     def quote_pattern(self):
         if self._quote_pattern is None:
-            self._quote_pattern = re.compile("\"[^\+]*?\"")
+            self._quote_pattern = re.compile('"[^\+]*?"')
         return self._quote_pattern
 
     @property
@@ -204,8 +225,13 @@ class WiktionaryParser:
         words = list()
 
         if lang_code is not None:
-            path = PATH + "/resources/frequency_words/content/2016/{0}/{0}_full.txt".format(lang_code)
-            with open(path, 'r', encoding='utf-8') as lexicon:
+            path = (
+                PATH
+                + "/resources/frequency_words/content/2016/{0}/{0}_full.txt".format(
+                    lang_code
+                )
+            )
+            with open(path, "r", encoding="utf-8") as lexicon:
                 line_no = 0
                 for line in lexicon:
                     word = line.split(" ", 1)[0]
@@ -227,7 +253,13 @@ class WiktionaryParser:
         :return: None
         """
         path = PATH + "/resources/data/" + filename + ".json"
-        json.dump(data, open(path, 'w', encoding='utf-8'), indent=1, sort_keys=True, ensure_ascii=False)
+        json.dump(
+            data,
+            open(path, "w", encoding="utf-8"),
+            indent=1,
+            sort_keys=True,
+            ensure_ascii=False,
+        )
 
     def load_json(self, filename):
         """
@@ -237,7 +269,7 @@ class WiktionaryParser:
         :return: X, content of given .json file
         """
         path = PATH + "/resources/data/" + filename + ".json"
-        return json.load(open(path, encoding='utf-8'))
+        return json.load(open(path, encoding="utf-8"))
 
     def load_wiktionary_entries(self):
         """
@@ -314,7 +346,9 @@ class WiktionaryParser:
             return
         else:
             entry = self.wiktionary_entries[word][lang][heading]
-            self.wiktionary_entries[word][lang][heading] = OrderedSet(entry + content).items()
+            self.wiktionary_entries[word][lang][heading] = OrderedSet(
+                entry + content
+            ).items()
 
     def contains_punct(self, word):
         """
@@ -323,7 +357,7 @@ class WiktionaryParser:
         :param word: str, word to check whether containing punctuation
         :return: bool, whether punctuation in this word or not
         """
-        return any(char in word for char in "\n\t "+string.punctuation)
+        return any(char in word for char in "\n\t " + string.punctuation)
 
     def is_punct(self, word):
         """
@@ -332,7 +366,9 @@ class WiktionaryParser:
         :param word: str, word to check whether containing punctuation
         :return: bool, whether punctuation in this word or not
         """
-        return all(not char.isalpha() for char in word) #all(char in string.punctuation for char in word)
+        return all(
+            not char.isalpha() for char in word
+        )  # all(char in string.punctuation for char in word)
 
     # LOOKUPS & FINDS
     # ---------------
@@ -432,7 +468,7 @@ class WiktionaryParser:
                     return section
                 else:
                     for section in entry:
-                        if section[:len(heading)] == heading:
+                        if section[: len(heading)] == heading:
                             return entry[section]
         return
 
@@ -514,8 +550,7 @@ class WiktionaryParser:
         word_entry = self.find_wiktionary_entry(word, lang, add_new=add_new)
 
         if word_entry is not None:
-            poses = [sect for sect in word_entry
-                     if sect in self.PARTS_OF_SPEECH]
+            poses = [sect for sect in word_entry if sect in self.PARTS_OF_SPEECH]
             pos_set = OrderedSet(poses)
             return pos_set.items()
         else:
@@ -562,7 +597,9 @@ class WiktionaryParser:
                     word_entries.update(self.find_english_translations(word, p, lang))
                 return word_entries.intersections()
 
-        word_entry = self.find_wiktionary_subentry(word, lang, heading=pos, add_new=add_new)
+        word_entry = self.find_wiktionary_subentry(
+            word, lang, heading=pos, add_new=add_new
+        )
         if word_entry is None:
             return []
         else:
@@ -583,13 +620,13 @@ class WiktionaryParser:
         :return: List[str], word's terms
         """
         if type(pos) == str:
-            return self.find_wiktionary_subentry(word, lang, pos, add_new)['terms']
+            return self.find_wiktionary_subentry(word, lang, pos, add_new)["terms"]
         else:
             terms = OrderedSet([])
             for p in pos:
                 subentry = self.find_wiktionary_subentry(word, lang, p, add_new)
                 if subentry is not None:
-                    terms.update(subentry.get('terms', []))
+                    terms.update(subentry.get("terms", []))
             return terms.intersections()
 
     # PAGES
@@ -678,7 +715,11 @@ class WiktionaryParser:
             # i.e. English wikt's top entry for "cent" is English,
             #      French wikt's for "cent" is French, etc.
             nuheader = page.find("span", attrs={"class": "mw-headline"})
-            if nuheader is not None and nuheader.find("span", attrs={"id": self.LANG_CODES[lang]}) is not None:
+            if (
+                nuheader is not None
+                and nuheader.find("span", attrs={"id": self.LANG_CODES[lang]})
+                is not None
+            ):
                 return nuheader.find_parent("h2")
         return header
 
@@ -721,8 +762,11 @@ class WiktionaryParser:
         :param page: BeautifulSoup.Tag, Wiktionary page to fetch IPAs from
         :return: List[unicode], IPAs from this page
         """
-        ipa_tags = [ipa for ipa in page.find_all("span", attrs={"class": "IPA"})
-                    if ipa.find_parent("li") is not None]
+        ipa_tags = [
+            ipa
+            for ipa in page.find_all("span", attrs={"class": "IPA"})
+            if ipa.find_parent("li") is not None
+        ]
         ipas = [self.clean_tag_ipa(ipa_tag) for ipa_tag in ipa_tags]
         ipas = OrderedSet(ipas).items()
         valid_ipas = [ipa for ipa in ipas if self.valid_ipa(ipa)]
@@ -739,12 +783,19 @@ class WiktionaryParser:
         """
         lang = self.verify_language(lang)
         num_roots = page.get_text().count("+") + 1
-        etym_tags = page.find_all("i", attrs={"xml:lang": self.lang_code(lang)}, limit=num_roots)
+        etym_tags = page.find_all(
+            "i", attrs={"xml:lang": self.lang_code(lang)}, limit=num_roots
+        )
         if len(etym_tags) == 0:
-            etym_tags = page.find_all("i", attrs={"lang": self.lang_code(lang)}, limit=num_roots)
+            etym_tags = page.find_all(
+                "i", attrs={"lang": self.lang_code(lang)}, limit=num_roots
+            )
         if len(etym_tags) != num_roots or num_roots == 1:  # corrects for errors
             return list()
-        etyms = [self.clean_text(self.remove_superscripts(etym_tag).get_text(" ")) for etym_tag in etym_tags]
+        etyms = [
+            self.clean_text(self.remove_superscripts(etym_tag).get_text(" "))
+            for etym_tag in etym_tags
+        ]
         return etyms
 
     def page_siblings(self, page, start_headers=set(), end_headers=set(), lang=None):
@@ -776,7 +827,7 @@ class WiktionaryParser:
         :param page: Tag, HTML for Wiktionary page
         :return: Tag, page's div content
         """
-        return page.find('div', attrs={'id': 'bodyContent', 'class': 'mw-body-content'})
+        return page.find("div", attrs={"id": "bodyContent", "class": "mw-body-content"})
 
     # TAG PARSING
     # -----------
@@ -799,11 +850,17 @@ class WiktionaryParser:
         curr_tag = tag
         next_sibling = curr_tag.nextSiblingGenerator()
         children = []
-        matches_lang = lambda t: lang is None or t.find_child('span', attrs={'class': 'mw-headline',
-                                                                                 'id': lang}) is not None
+        matches_lang = (
+            lambda t: lang is None
+            or t.find_child("span", attrs={"class": "mw-headline", "id": lang})
+            is not None
+        )
 
         if len(start_headers) != 0:
-            while not (getattr(curr_tag, 'name', '') in start_headers and matches_lang(curr_tag)):
+            while not (
+                getattr(curr_tag, "name", "") in start_headers
+                and matches_lang(curr_tag)
+            ):
                 try:
                     curr_tag = next(next_sibling)
                 except StopIteration:
@@ -814,10 +871,12 @@ class WiktionaryParser:
         except StopIteration:
             return children
 
-        end_header = lambda t: getattr(t, 'id', '') == "mw-navigation"
+        end_header = lambda t: getattr(t, "id", "") == "mw-navigation"
 
         if len(end_headers) != 0:
-            while not (getattr(curr_tag, 'name', '') in end_headers or end_header(curr_tag)):
+            while not (
+                getattr(curr_tag, "name", "") in end_headers or end_header(curr_tag)
+            ):
                 if curr_tag is not None:
                     if str(curr_tag)[:4] == "<!--":
                         break
@@ -849,7 +908,9 @@ class WiktionaryParser:
         :param lang: Optional[str], language of entry to subtag
         :return: Tag, BeautifulSoup Tag with only this tag's children
         """
-        return self.soupify(self.tag_siblings(tag, start_headers, end_headers, lang=lang))
+        return self.soupify(
+            self.tag_siblings(tag, start_headers, end_headers, lang=lang)
+        )
 
     # TEXT CLEANUP / HELPERS
     # ----------------------
@@ -885,13 +946,15 @@ class WiktionaryParser:
         :param scrub: bool, whether to also remove diacritics
         :return: unicode, given ipa with stress/syllable marks removed
         """
-        cleaned = re.sub("[ˈˌ./›\"]", "", self.clean_word(ipa))
+        cleaned = re.sub('[ˈˌ./›"]', "", self.clean_word(ipa))
         if scrub:
             cleaned = self.remove_diacritics(cleaned)
         return cleaned
 
     def clean_tag_ipa(self, tag):
-        tag_ipa = self.clean_text(self.remove_superscripts(tag).get_text()).replace(" ", "")
+        tag_ipa = self.clean_text(self.remove_superscripts(tag).get_text()).replace(
+            " ", ""
+        )
         return self.clean_ipa(self.remove_digits(tag_ipa.split("→")[0]))
 
     def clean_word(self, word):
@@ -957,7 +1020,9 @@ class WiktionaryParser:
         return "".join([char for char in s if char in ALLSYMBOLS or char in ", "])
 
     def remove_digits(self, s):
-        return "".join([char for char in s if not char.isdigit() and char not in "⁻⁽⁾ˀ"])
+        return "".join(
+            [char for char in s if not char.isdigit() and char not in "⁻⁽⁾ˀ"]
+        )
 
     def remove_parens(self, word):
         """
@@ -1101,6 +1166,7 @@ class WiktionaryPage:
     Automatically adds data from all WiktionaryPages to its parent
     WiktionaryParser's wiktionary_entries.
     """
+
     def __init__(self, word, lang=None, parser=None):
         if parser is None:
             self.parser = WiktionaryParser()
@@ -1163,7 +1229,9 @@ class WiktionaryPage:
 
         if page is not None:
             entry_headers = {"h3", "h4", "h5"}
-            tags = page.find_all("span", attrs={"class": "mw-headline", "id": self.desired_header})
+            tags = page.find_all(
+                "span", attrs={"class": "mw-headline", "id": self.desired_header}
+            )
 
             for tag in tags:
                 header_lang = self.header_lang(tag)
@@ -1174,18 +1242,25 @@ class WiktionaryPage:
 
                         if heading is not None:
                             header_name = self.header_text(tag)
-                            heading_entry = self.heading_entry(heading, header_name, header_lang)
+                            heading_entry = self.heading_entry(
+                                heading, header_name, header_lang
+                            )
 
                             if heading_entry is not None and len(heading_entry) != 0:
                                 entries.setdefault(header_lang, dict())
                                 if header_name in self.parser.PARTS_OF_SPEECH:
                                     entries[header_lang].setdefault(header_name, dict())
-                                    entries[header_lang][header_name].update(heading_entry)
+                                    entries[header_lang][header_name].update(
+                                        heading_entry
+                                    )
                                 elif self.is_header_declension(header_name):
                                     entries[header_lang][header_name] = heading_entry
                                 else:
                                     entries[header_lang].setdefault(header_name, list())
-                                    subentry = entries[header_lang][header_name] + heading_entry
+                                    subentry = (
+                                        entries[header_lang][header_name]
+                                        + heading_entry
+                                    )
                                     new_entry = OrderedSet(subentry).order_items()
                                     entries[header_lang][header_name] = new_entry
                 elif header_lang == "":
@@ -1196,7 +1271,9 @@ class WiktionaryPage:
         return entries
 
     def is_header_declension(self, header):
-        return header[:6] == "Inflec" or header[:6] == "Declen" or header[:6] == "Conjug"
+        return (
+            header[:6] == "Inflec" or header[:6] == "Declen" or header[:6] == "Conjug"
+        )
 
     def header_text(self, header):
         """
@@ -1206,7 +1283,7 @@ class WiktionaryPage:
         :param header: Tag, HTML header to extract text from
         :return: str, Wiktionary header's text
         """
-        text = getattr(header, 'text', '')
+        text = getattr(header, "text", "")
         return self.parser.clean_header(text)
 
     def header_lang(self, heading):
@@ -1235,10 +1312,16 @@ class WiktionaryPage:
         :return: Tag, this Tag's contents from start_headers up to stop_headers
         """
         page = self.parser.page_content(page)
-        tags = [t for t in page.find_all(start_headers) if t.find('span', attrs={'id': lang}) is not None or
-                (lang is None and t.find('span', attrs={'id': self.parser.LANG_CODES}))]
+        tags = [
+            t
+            for t in page.find_all(start_headers)
+            if t.find("span", attrs={"id": lang}) is not None
+            or (lang is None and t.find("span", attrs={"id": self.parser.LANG_CODES}))
+        ]
         if len(tags) != 0:
-            return self.parser.soupify_siblings(tags[0], end_headers=stop_headers, lang=lang)
+            return self.parser.soupify_siblings(
+                tags[0], end_headers=stop_headers, lang=lang
+            )
 
     def subtag(self, tag, start_headers=set(), stop_headers=set(), lang=None):
         """
@@ -1267,20 +1350,22 @@ class WiktionaryPage:
         if tag is None:
             return
         else:
-            return self.parser.clean_text(self.parser.remove_sublists(tag).get_text(" "))
+            return self.parser.clean_text(
+                self.parser.remove_sublists(tag).get_text(" ")
+            )
 
     def tag_comparables(self, tag):
         comparables = dict()
         if tag is not None:
-            has_link = tag.find('a', attrs={'title': 'Appendix:Glossary'})
+            has_link = tag.find("a", attrs={"title": "Appendix:Glossary"})
             if has_link is not None:
                 curr_tag = tag
                 while curr_tag is not None:
-                    curr_tag = curr_tag.find_next_sibling('i')
+                    curr_tag = curr_tag.find_next_sibling("i")
                     comp_text = self.tag_text(curr_tag)
                     if curr_tag is None:
                         break
-                    curr_tag = curr_tag.find_next_sibling('b')
+                    curr_tag = curr_tag.find_next_sibling("b")
                     val_text = self.tag_text(curr_tag)
                     curr_comp = comparables.setdefault(comp_text, list())
                     if val_text not in curr_comp:
@@ -1289,17 +1374,21 @@ class WiktionaryPage:
 
     def tag_sentences(self, tag):
         sentences = list()
-        if tag.find('dl') is not None:
-            tag_sents = tag.find_all('dd')
+        if tag.find("dl") is not None:
+            tag_sents = tag.find_all("dd")
             if tag_sents is not None:
                 for tag_sent in tag_sents:
                     sent_text = self.tag_text(tag_sent)
                     if len(sent_text) != 0 and sent_text not in sentences:
                         sentences.append(sent_text)
-                        ital_tag = tag_sent.find('i')
+                        ital_tag = tag_sent.find("i")
                         if ital_tag is not None:
                             ital_text = self.tag_text(ital_tag)
-                            if sent_text != ital_text and ital_text not in sentences and len(ital_text) != 0:
+                            if (
+                                sent_text != ital_text
+                                and ital_text not in sentences
+                                and len(ital_text) != 0
+                            ):
                                 sentences.append(ital_text)
         return sentences
 
@@ -1313,7 +1402,9 @@ class WiktionaryPage:
         :param tag: Tag, BeautifulSoup HTML to extract lemma from
         :return: str, lemma from given tag
         """
-        lemma = tag.find("span", attrs={"class": ["mention", "form-of-definition-link"]})
+        lemma = tag.find(
+            "span", attrs={"class": ["mention", "form-of-definition-link"]}
+        )
         lemma_text = self.tag_text(lemma)
         return lemma_text
 
@@ -1326,18 +1417,21 @@ class WiktionaryPage:
         """
         english_lexicon = self.parser.find_lexicon("English")
         links = tag.find_all("a", attrs={"title": english_lexicon})
-        lemmas = [link.get("title") for link in links
-                  if "#" not in link.get("href") and link.parent.name == "li"]
+        lemmas = [
+            link.get("title")
+            for link in links
+            if "#" not in link.get("href") and link.parent.name == "li"
+        ]
         return lemmas
 
     def tags_texts(self, tags):
         return [self.tag_text(tag) for tag in tags]
 
     def tag_glossary_terms(self, tag):
-        gloss_terms = tag.find_all('a', attrs={'title': 'Appendix:Glossary'})
-        paren_tag = tag.find('span', attrs={'class': 'ib-content'})
+        gloss_terms = tag.find_all("a", attrs={"title": "Appendix:Glossary"})
+        paren_tag = tag.find("span", attrs={"class": "ib-content"})
         if paren_tag is not None:
-            gloss_terms += paren_tag.find_all('a')
+            gloss_terms += paren_tag.find_all("a")
         return self.tags_texts(gloss_terms)
 
     def tag_lemmas(self, tag, lang=None):
@@ -1354,16 +1448,24 @@ class WiktionaryPage:
         lang = self.parser.verify_language(lang)
 
         if tag is not None:
-            lemmas = tag.find_all("span", attrs={"class": ["mention", "form-of-definition-link"]})
+            lemmas = tag.find_all(
+                "span", attrs={"class": ["mention", "form-of-definition-link"]}
+            )
 
             if lang == "English":
-                is_en = lambda h: h is not None and h[:6] == '/wiki/' and '#' not in h
-                lang_tags = tag.find_all('a', attrs={'href': is_en})
-                lang_tags = [l for l in lang_tags if l.find_parent("span", attrs={"class": "ib-content"}) is None]
+                is_en = lambda h: h is not None and h[:6] == "/wiki/" and "#" not in h
+                lang_tags = tag.find_all("a", attrs={"href": is_en})
+                lang_tags = [
+                    l
+                    for l in lang_tags
+                    if l.find_parent("span", attrs={"class": "ib-content"}) is None
+                ]
             else:
-                lang_tags = tag.find_all(attrs={"lang": self.parser.LANG_CODES.get(lang, None)})
-                is_lang = lambda h: h[-len(lang):] == lang
-                lang_tags += tag.find_all('a', attrs={'href': is_lang})
+                lang_tags = tag.find_all(
+                    attrs={"lang": self.parser.LANG_CODES.get(lang, None)}
+                )
+                is_lang = lambda h: h[-len(lang) :] == lang
+                lang_tags += tag.find_all("a", attrs={"href": is_lang})
 
             lemmas += lang_tags
 
@@ -1427,15 +1529,18 @@ class WiktionaryPage:
         word_tag = self.parser.remove_sublists(word_tag)
         subdefns = word_tag.find_all("li")
         head = self.tag_text(word_tag.find("strong"))
-        defns = {'head': head, 'definitions': list(), 'lemmas': {lang: OrderedSet([]),
-                                                                 'English': OrderedSet([])},
-                 'terms': list()}
-        comparables = self.tag_comparables(word_tag.find('p'))
+        defns = {
+            "head": head,
+            "definitions": list(),
+            "lemmas": {lang: OrderedSet([]), "English": OrderedSet([])},
+            "terms": list(),
+        }
+        comparables = self.tag_comparables(word_tag.find("p"))
         if len(comparables) != 0:
-            defns['comparables'] = comparables
+            defns["comparables"] = comparables
         sentences = self.tag_sentences(word_tag)
         if len(sentences) != 0:
-            defns['sentences'] = sentences
+            defns["sentences"] = sentences
 
         if head is not None:
             self.word = head
@@ -1443,27 +1548,31 @@ class WiktionaryPage:
         for subdefn in subdefns:
             defn = self.tag_text(subdefn)
             if len(defn) != 0:
-                defns['definitions'].append(defn)
+                defns["definitions"].append(defn)
 
             lemmas = self.tag_lemmas(subdefn, lang)
 
             if len(lemmas) == 0:
-                lemmas = self.tag_lemmas(subdefn, 'English')
+                lemmas = self.tag_lemmas(subdefn, "English")
                 if len(lemmas) != 0:
-                    language = 'English'
+                    language = "English"
                 else:
                     continue
             else:
                 language = lang
 
-            lemmas = [self.parser.clean_parentheticals(l) for l in lemmas if l is not None and l != ""]
-            defns['lemmas'][language].update(lemmas)
-            defns['terms'].extend(self.tag_glossary_terms(subdefn))
+            lemmas = [
+                self.parser.clean_parentheticals(l)
+                for l in lemmas
+                if l is not None and l != ""
+            ]
+            defns["lemmas"][language].update(lemmas)
+            defns["terms"].extend(self.tag_glossary_terms(subdefn))
 
-        defns['lemmas'][lang] = defns['lemmas'][lang].items()
-        if type(defns['lemmas']['English']) == OrderedSet:
-            defns['lemmas']['English'] = defns['lemmas']['English'].items()
-        defns['terms'] = OrderedSet.remove_duplicates(defns['terms'])
+        defns["lemmas"][lang] = defns["lemmas"][lang].items()
+        if type(defns["lemmas"]["English"]) == OrderedSet:
+            defns["lemmas"]["English"] = defns["lemmas"]["English"].items()
+        defns["terms"] = OrderedSet.remove_duplicates(defns["terms"])
 
         return defns
 
@@ -1490,8 +1599,8 @@ class WiktionaryPage:
         subtags = pos_tag.find_all(["strong", "li"])
 
         for subtag in subtags:
-            print("SUBTAG'S NAME IS", subtag.get('name'))
-            if subtag.get('name') == 'strong':
+            print("SUBTAG'S NAME IS", subtag.get("name"))
+            if subtag.get("name") == "strong":
                 print("FOUND A HEADWORD")
                 descriptors = subtag.find_next_siblings("i")
                 lexemes = subtag.find_next_siblings("b")
@@ -1501,7 +1610,11 @@ class WiktionaryPage:
             lemmas = self.tag_lemmas(subtag, lang)
             if defn != "" and len(lemmas) != 0:
                 for lemma in lemmas:
-                    lemma = None if lemma is None or lemma == "" else self.parser.clean_parentheticals(lemma)
+                    lemma = (
+                        None
+                        if lemma is None or lemma == ""
+                        else self.parser.clean_parentheticals(lemma)
+                    )
                     pair = (defn, lemma)
                     pairs.append(pair)
 
@@ -1579,6 +1692,7 @@ class WiktionaryTable:
     """
     A class for parsing Wiktionary pages into language data.
     """
+
     def __init__(self, table, lang, wikt_page):
         self.language = lang
         self.wikt_page = wikt_page
@@ -1618,7 +1732,7 @@ class WiktionaryTable:
         :param cell: Tag, BeautifulSoup cell in table to check if header
         :return: bool, whether given cell is a (row or column) header
         """
-        return cell.name == 'th' if cell is not None else False
+        return cell.name == "th" if cell is not None else False
 
     def is_content(self, cell):
         """
@@ -1650,7 +1764,11 @@ class WiktionaryTable:
         except (AttributeError, IndexError):
             first_item = cell
         # cell not valid if empty, begins w/ superscript, or has paragraph
-        return (not self.is_cell_empty(cell)) and getattr(first_item, 'name', None) != "sup" and cell.find("p") is None
+        return (
+            (not self.is_cell_empty(cell))
+            and getattr(first_item, "name", None) != "sup"
+            and cell.find("p") is None
+        )
 
     def contains_content(self, tag):
         """
@@ -1660,8 +1778,8 @@ class WiktionaryTable:
         :param tag: Tag, BeautifulSoup Tag to ask if it contains content
         :return: bool, True if tag contains content and False otherwise
         """
-        matches_href = lambda t: t[-len(self.language):] == self.language
-        tag_link = tag.find("a", attrs={'href': matches_href})
+        matches_href = lambda t: t[-len(self.language) :] == self.language
+        tag_link = tag.find("a", attrs={"href": matches_href})
         return tag_link is not None
 
     def is_cell_empty(self, cell):
@@ -1730,7 +1848,9 @@ class WiktionaryTable:
         """
         try:
             cell = self.wikt_page.parser.remove_sublists(cell)
-            spans = cell.find_all("span", lang=self.wikt_page.parser.LANG_CODES[language])
+            spans = cell.find_all(
+                "span", lang=self.wikt_page.parser.LANG_CODES[language]
+            )
             if len(spans) != 0:
                 return [self.wikt_page.tag_text(span) for span in spans]
         except (AttributeError, KeyError):
@@ -1746,8 +1866,14 @@ class WiktionaryTable:
         """
         try:
             cell = self.wikt_page.parser.remove_sublists(cell)
-            spans = cell.find_all("span", lang=self.wikt_page.parser.LANG_CODES[language])
-            text = self.wikt_page.tag_text(cell) if len(spans) == 0 else self.content_text(spans)
+            spans = cell.find_all(
+                "span", lang=self.wikt_page.parser.LANG_CODES[language]
+            )
+            text = (
+                self.wikt_page.tag_text(cell)
+                if len(spans) == 0
+                else self.content_text(spans)
+            )
             return self.wikt_page.parser.clean_text(text)
         except AttributeError:
             return ""
@@ -1797,8 +1923,7 @@ class WiktionaryTable:
         """
         row_num, col_num = coord
         sorted_dict = sorted(table_dict)
-        prev_rows = [c for c in sorted_dict if c[0] == row_num
-                     and c[1] < col_num]
+        prev_rows = [c for c in sorted_dict if c[0] == row_num and c[1] < col_num]
         num_rows, num_cols = sorted_dict[-1]
         rows = []
         header_yet = False
@@ -1830,8 +1955,7 @@ class WiktionaryTable:
         """
         row_num, col_num = coord
         sorted_dict = sorted(table_dict)
-        prev_cols = [c for c in sorted_dict if c[1] == col_num
-                     and c[0] < row_num]
+        prev_cols = [c for c in sorted_dict if c[1] == col_num and c[0] < row_num]
         cols = []
         header_yet = False
 
@@ -1860,8 +1984,13 @@ class WiktionaryTable:
         cells = self.table_content(table)
         links = [cell.find("a") for cell in cells if cell.find("a") is not None]
         hrefs = [link.get("href") for link in links if link.get("href") is not None]
-        all_langs = all([href[-len(language):] == language.replace(" ", "_") or
-                         href[-9:] == "redlink=1" for href in hrefs])
+        all_langs = all(
+            [
+                href[-len(language) :] == language.replace(" ", "_")
+                or href[-9:] == "redlink=1"
+                for href in hrefs
+            ]
+        )
         return all_langs
 
     def table_cells(self, table):
@@ -1912,16 +2041,22 @@ class WiktionaryTable:
         :param language: str, language of inflectional table
         :return: Tag, inflection table from tag in language
         """
-        infl_tables = tag.find_all('table', attrs={'class': 'wikitable inflection-table'})
+        infl_tables = tag.find_all(
+            "table", attrs={"class": "wikitable inflection-table"}
+        )
 
         if len(infl_tables) != 0:
             return infl_tables[0]
         else:
-            tables = tag.find_all('table')
+            tables = tag.find_all("table")
             for table in tables:
-                prev_header = tag.find_previous_sibling('h4')
-                lang_header = tag.find_previous_sibling('h2')  # if None, assume table already in language
-                is_in_language = lang_header is None or lang_header[:len(language)] == language
+                prev_header = tag.find_previous_sibling("h4")
+                lang_header = tag.find_previous_sibling(
+                    "h2"
+                )  # if None, assume table already in language
+                is_in_language = (
+                    lang_header is None or lang_header[: len(language)] == language
+                )
                 if prev_header is not None and is_in_language:
                     if self.wikt_page.is_header_declension(prev_header.get_text()):
                         return table
@@ -2025,7 +2160,7 @@ class WiktionaryTable:
                             c += 1
                         except StopIteration:
                             try:
-                                next(row_iter) #row_iter.__next__()
+                                next(row_iter)  # row_iter.__next__()
                                 r += 1
                             except StopIteration:
                                 break
@@ -2054,7 +2189,7 @@ class WiktionaryTable:
                             for i in range(1, colspan):
                                 try:
                                     next(col_iter)
-                                    #col_iter.next()
+                                    # col_iter.next()
                                 except StopIteration:
                                     break
 
@@ -2078,12 +2213,14 @@ class WiktionaryTable:
                 list of words for given row & column
         """
         coords = self.parse_table(table)
-        #self.visualize_inflections(coords)
+        # self.visualize_inflections(coords)
         sorted_coords = sorted(coords)
         inflections = dict()
-        line_names = lambda line: [l for l in line
-                                  if len(line) > 0 and "—" not in l and
-                                  not self.wikt_page.parser.is_punct(l)]
+        line_names = lambda line: [
+            l
+            for l in line
+            if len(line) > 0 and "—" not in l and not self.wikt_page.parser.is_punct(l)
+        ]
 
         for coord in sorted_coords:
             cell = coords[coord]
@@ -2095,8 +2232,12 @@ class WiktionaryTable:
                 entry = self.cell_entry(cell, language)
 
                 if len(entry) > 0:
-                    if (len(row_names) > 0 or len(col_names) > 0) or self.num_rows-self.num_cols == 1:
-                        cols_rows = col_names + row_names  # nest dicts w/ columns on outside, rows on inside
+                    if (
+                        len(row_names) > 0 or len(col_names) > 0
+                    ) or self.num_rows - self.num_cols == 1:
+                        cols_rows = (
+                            col_names + row_names
+                        )  # nest dicts w/ columns on outside, rows on inside
                         curr_dict_loc = inflections
 
                         for i in range(len(cols_rows)):
@@ -2108,7 +2249,9 @@ class WiktionaryTable:
                             if init_type == list and type(curr_dict_loc) == list:
                                 return self.get_simple_inflections()
                             else:
-                                curr_dict_loc = curr_dict_loc.setdefault(cr, init_type())
+                                curr_dict_loc = curr_dict_loc.setdefault(
+                                    cr, init_type()
+                                )
 
                         try:
                             curr_dict_loc += OrderedSet(entry).items()
@@ -2125,18 +2268,28 @@ class WiktionaryTable:
         :return: None
         """
         if len(inflections) != 0:
-            bold = '\033[1m'
-            end_bold = '\033[0m'
+            bold = "\033[1m"
+            end_bold = "\033[0m"
 
-            inflections_len = len(max(inflections.values(), key=lambda v: len(v.text)).text)
+            inflections_len = len(
+                max(inflections.values(), key=lambda v: len(v.text)).text
+            )
             max_row, max_col = sorted(inflections)[-1]
             row_digits = len(str(max_row))
             width_padding = 5
             col_width = inflections_len + width_padding
-            col_intro = " " * int(col_width * 1.25)  # begin just after 1 for centred spacing
+            col_intro = " " * int(
+                col_width * 1.25
+            )  # begin just after 1 for centred spacing
             col_space = " " * col_width
 
-            print("Inflections:\n", bold + col_intro + col_space.join([str(i) for i in range(max_col + 1)]) + end_bold)
+            print(
+                "Inflections:\n",
+                bold
+                + col_intro
+                + col_space.join([str(i) for i in range(max_col + 1)])
+                + end_bold,
+            )
 
             for coord in sorted(inflections):
                 x, y = coord
@@ -2144,11 +2297,14 @@ class WiktionaryTable:
                 text = self.wikt_page.parser.clean_text(val.get_text(" "))
                 offset = col_width - len(text)
                 if y == 0:
-                    print("\n", bold + str(coord[0]).zfill(row_digits) + end_bold + col_space, end="")
+                    print(
+                        "\n",
+                        bold + str(coord[0]).zfill(row_digits) + end_bold + col_space,
+                        end="",
+                    )
 
                 is_header = self.is_header(val)
                 if is_header:
                     text = bold + text + end_bold
                 print(text + (" " * offset), end="")
             print()
-

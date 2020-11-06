@@ -13,6 +13,7 @@ class MorphemeParser(PhonemeParser):
     A class for extracting and analyzing morphemes in a
     given language.
     """
+
     def __init__(self, lang):
         PhonemeParser.__init__(lang)
         self.affixes = set()
@@ -106,10 +107,14 @@ class MorphemeParser(PhonemeParser):
         while len(new_word) != 0:
             for morpheme in sorted(words, key=lambda m: len(m), reverse=True):
                 if morpheme != word and len(morpheme) > 1:
-                    if morpheme == new_word[:len(morpheme)] and len(last_morpheme) > 1 and last_morpheme in words:
+                    if (
+                        morpheme == new_word[: len(morpheme)]
+                        and len(last_morpheme) > 1
+                        and last_morpheme in words
+                    ):
                         morphemes.append(last_morpheme)
                         morphemes.append(morpheme)
-                        new_word = new_word[len(morpheme):]
+                        new_word = new_word[len(morpheme) :]
                         last_morpheme = str()
                         break
             else:
@@ -178,7 +183,10 @@ class MorphemeParser(PhonemeParser):
         :return: List[tuple(str, str, str)], the given
             word's syllables' onsets, rhymes, and codas, respectively
         """
-        return [self.break_word_syllable(syllable) for syllable in self.split_word_syllables(word)]
+        return [
+            self.break_word_syllable(syllable)
+            for syllable in self.split_word_syllables(word)
+        ]
 
     def split_word_syllables(self, word):
         """
@@ -207,7 +215,7 @@ class MorphemeParser(PhonemeParser):
                     if not any(self.is_letter_vowel(char) for char in word[i:]):
                         coda += word[i:]
                         break
-                    elif i+1 < len(word) and self.is_letter_vowel(word[i+1]):
+                    elif i + 1 < len(word) and self.is_letter_vowel(word[i + 1]):
                         coda += word[i]
                     triplet = (onset, rhyme, coda)
                     syllables.append(triplet)
@@ -276,8 +284,10 @@ class MorphemeParser(PhonemeParser):
         :return: List[tuple(str, str, str)], the given
             syllables' onsets, rhymes, and codas, respectively
         """
-        return [self.break_syllable(syllable)
-                for syllable in self.split_syllables(ipa, use_syllables)]
+        return [
+            self.break_syllable(syllable)
+            for syllable in self.split_syllables(ipa, use_syllables)
+        ]
 
     def extract_syllable(self, ipa, idx=0, use_syllables=True):
         """
@@ -390,7 +400,9 @@ class MorphemeParser(PhonemeParser):
                     if len(ipa) == 0:
                         syllable.append(phoneme)
                     else:
-                        new_phoneme, new_ipa = self.next_phoneme(ipa, remove=True, use_syllables=False)
+                        new_phoneme, new_ipa = self.next_phoneme(
+                            ipa, remove=True, use_syllables=False
+                        )
                         if self.is_ipa_vowel(new_phoneme) is False:
                             syllable.append(phoneme)
                         else:
@@ -421,17 +433,14 @@ class Morpheme:
         4) circumfix (*XX*)
         5) interfix  (XX*X)
     """
-    AFFIXES = {"prefix",
-               "suffix",
-               "infix",
-               "circumfix",
-               "interfix"}
+
+    AFFIXES = {"prefix", "suffix", "infix", "circumfix", "interfix"}
 
     def __init__(self, word, language, is_free, type):
         self.word = word
         self.language = language.title()
         self._is_free = is_free
-        self._type = type      # root part-of-speech or affix type
+        self._type = type  # root part-of-speech or affix type
 
     @property
     def is_free(self):
@@ -451,4 +460,3 @@ class Morpheme:
 
     def __hash__(self):
         return hash(self.word + self.language[:3] + str(self.type))
-

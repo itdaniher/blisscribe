@@ -1,8 +1,8 @@
-
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.pipeline import Pipeline
-#from translation.blisscribe import tokenizers
+
+# from translation.blisscribe import tokenizers
 
 
 alice_txt = """ROZDZIAŁ I: PRZEZ KRÓLICZĄ NORĘ
@@ -36,121 +36,134 @@ nawet głowy. „A zresztą, gdyby nawet moja głowa dostała się do ogrodu, ni
 """
 
 ALICE_TAGGED = [
-    [('ROZDZIAŁ', 'NN'),
-     ('I', 'CD'),
-     (':', ':'),
-     ('PRZEZ', 'IN'),
-     ('KRÓLICZĄ', 'NN'),
-     ('NORĘ', 'NN'),
-     ('.', '.')],
-    [('Alicja', 'NNP'),
-     ('miała', 'VBD'),
-     ('już', 'RB'),
-     ('dość', 'RB'),
-     ('siedzenia', 'VB'),
-     ('na', 'IN'),
-     ('ławce', 'NN'),
-     ('obok', 'IN'),
-     ('siostry', 'NN'),
-     ('i', 'CC'),
-     ('próżnowania', 'NN'),
-     ('.', '.')],
-    [('Raz', 'NN'),
-     ('czy', 'CC'),
-     ('dwa', 'CD'),
-     ('razy', 'NNS'),
-     ('zerknęła', 'VBD'),
-     ('do', 'IN'),
-     ('książki', 'NN'),
-     (',', ','),
-     ('którą', 'DT'),
-     ('czytała', 'VBD'),
-     ('siostra', 'NN'),
-     ('.', '.')],
-    [('Niestety', 'RB'),
-     (',', ','),
-     ('w', 'IN'),
-     ('książce', 'NN'),
-     ('nie', 'DT'),
-     ('było', 'VBD'),
-     ('obrazków', 'NNS'),
-     ('ani', 'CC'),
-     ('rozmów', 'NNS'),
-     ('.', '.')],
-    [('"', '"'),
-     ('A', 'CC'),
-     ('cóż', 'DT'),
-     ('jest', 'VB'),
-     ('warta', 'NN'),
-     ('książka', 'NN'),
-     ('-', ':'),
-     ('pomyślała', 'VBD'),
-     ('Alicja', 'NNP'),
-     ('-', ':'),
-     ('w', 'IN'),
-     ('której', 'DT'),
-     ('nie', 'DT'),
-     ('ma', 'VB'),
-     ('rozmów', 'NNS'),
-     ('ani', 'CC'),
-     ('obrazków', 'NNS'),
-     ('?', '?'),
-     ('"', '"')],
-    [('Alicja', 'NNP'),
-     ('rozmyślała', 'VBD'),
-     ('właśnie', 'RP'),
-     ('-', ':'),
-     ('a', 'CC'),
-     ('raczej', 'CC'),
-     ('starała', 'VBD'),
-     ('się', 'NNP'),
-     ('rozmyślać', 'VB'),
-     (',', ','),
-     ('ponieważ', 'CC'),
-     ('upał', 'NN'),
-     ('czynił', 'VBD'),
-     ('ją', 'CC'),
-     ('bardzo', 'RB'),
-     ('senną', 'JJ'),
-     ('i', 'CC'),
-     ('niemrawą', 'JJ'),
-     ('-', ':'),
-     ('czy', 'CC'),
-     ('warto', 'VB'),
-     ('męczyć', 'VB'),
-     ('się', 'NNP'),
-     ('przy', 'IN'),
-     ('zrywaniu', 'VBG'),
-     ('stokrotek', 'NNS'),
-     ('po', 'IN'),
-     ('to', 'NNP'),
-     (',', ','),
-     ('aby', 'CC'),
-     ('uwić', 'VB'),
-     ('z', 'IN'),
-     ('nich', 'DT'),
-     ('wianek', 'NN'),
-     ('.', '.')]
+    [
+        ("ROZDZIAŁ", "NN"),
+        ("I", "CD"),
+        (":", ":"),
+        ("PRZEZ", "IN"),
+        ("KRÓLICZĄ", "NN"),
+        ("NORĘ", "NN"),
+        (".", "."),
+    ],
+    [
+        ("Alicja", "NNP"),
+        ("miała", "VBD"),
+        ("już", "RB"),
+        ("dość", "RB"),
+        ("siedzenia", "VB"),
+        ("na", "IN"),
+        ("ławce", "NN"),
+        ("obok", "IN"),
+        ("siostry", "NN"),
+        ("i", "CC"),
+        ("próżnowania", "NN"),
+        (".", "."),
+    ],
+    [
+        ("Raz", "NN"),
+        ("czy", "CC"),
+        ("dwa", "CD"),
+        ("razy", "NNS"),
+        ("zerknęła", "VBD"),
+        ("do", "IN"),
+        ("książki", "NN"),
+        (",", ","),
+        ("którą", "DT"),
+        ("czytała", "VBD"),
+        ("siostra", "NN"),
+        (".", "."),
+    ],
+    [
+        ("Niestety", "RB"),
+        (",", ","),
+        ("w", "IN"),
+        ("książce", "NN"),
+        ("nie", "DT"),
+        ("było", "VBD"),
+        ("obrazków", "NNS"),
+        ("ani", "CC"),
+        ("rozmów", "NNS"),
+        (".", "."),
+    ],
+    [
+        ('"', '"'),
+        ("A", "CC"),
+        ("cóż", "DT"),
+        ("jest", "VB"),
+        ("warta", "NN"),
+        ("książka", "NN"),
+        ("-", ":"),
+        ("pomyślała", "VBD"),
+        ("Alicja", "NNP"),
+        ("-", ":"),
+        ("w", "IN"),
+        ("której", "DT"),
+        ("nie", "DT"),
+        ("ma", "VB"),
+        ("rozmów", "NNS"),
+        ("ani", "CC"),
+        ("obrazków", "NNS"),
+        ("?", "?"),
+        ('"', '"'),
+    ],
+    [
+        ("Alicja", "NNP"),
+        ("rozmyślała", "VBD"),
+        ("właśnie", "RP"),
+        ("-", ":"),
+        ("a", "CC"),
+        ("raczej", "CC"),
+        ("starała", "VBD"),
+        ("się", "NNP"),
+        ("rozmyślać", "VB"),
+        (",", ","),
+        ("ponieważ", "CC"),
+        ("upał", "NN"),
+        ("czynił", "VBD"),
+        ("ją", "CC"),
+        ("bardzo", "RB"),
+        ("senną", "JJ"),
+        ("i", "CC"),
+        ("niemrawą", "JJ"),
+        ("-", ":"),
+        ("czy", "CC"),
+        ("warto", "VB"),
+        ("męczyć", "VB"),
+        ("się", "NNP"),
+        ("przy", "IN"),
+        ("zrywaniu", "VBG"),
+        ("stokrotek", "NNS"),
+        ("po", "IN"),
+        ("to", "NNP"),
+        (",", ","),
+        ("aby", "CC"),
+        ("uwić", "VB"),
+        ("z", "IN"),
+        ("nich", "DT"),
+        ("wianek", "NN"),
+        (".", "."),
+    ],
 ]
+
 
 def features(sentence, index):
     return {
-        'word': sentence[index],
-        'prev_word': '' if index == 0 else sentence[index-1],
-        'next_word': '' if index+1 == len(sentence) else sentence[index+1],
-        'prefix-1': sentence[index][0],
-        'prefix-2': sentence[index][:2],
-        'prefix-3': sentence[index][:3],
-        'suffix-1': sentence[index][-1],
-        'suffix-2': sentence[index][-2:],
-        'suffix-3': sentence[index][-3:],
-        'is_first': index == 0,
-        'is_last': index == len(sentence) - 1,
-        'is_capitalized': sentence[index][0].upper() == sentence[index][0],
-        'is_all_caps': sentence[index].upper() == sentence[index],
-        'is_all_lower': sentence[index].lower() == sentence[index],
-        'has_hyphen': '-' in sentence[index],
-        'is_numeric': sentence[index].isdigit(),
+        "word": sentence[index],
+        "prev_word": "" if index == 0 else sentence[index - 1],
+        "next_word": "" if index + 1 == len(sentence) else sentence[index + 1],
+        "prefix-1": sentence[index][0],
+        "prefix-2": sentence[index][:2],
+        "prefix-3": sentence[index][:3],
+        "suffix-1": sentence[index][-1],
+        "suffix-2": sentence[index][-2:],
+        "suffix-3": sentence[index][-3:],
+        "is_first": index == 0,
+        "is_last": index == len(sentence) - 1,
+        "is_capitalized": sentence[index][0].upper() == sentence[index][0],
+        "is_all_caps": sentence[index].upper() == sentence[index],
+        "is_all_lower": sentence[index].lower() == sentence[index],
+        "has_hyphen": "-" in sentence[index],
+        "is_numeric": sentence[index].isdigit(),
     }
 
 
@@ -170,7 +183,7 @@ def transform_to_dataset(tagged_sentences):
 
 
 # Split the dataset for training and testing
-cutoff = int(.75 * len(ALICE_TAGGED))
+cutoff = int(0.75 * len(ALICE_TAGGED))
 training_sentences = ALICE_TAGGED[:cutoff]
 test_sentences = ALICE_TAGGED[cutoff:]
 
@@ -179,18 +192,22 @@ print(len(test_sentences))
 
 ALICE_X, ALICE_Y = transform_to_dataset(training_sentences)
 
-classifier = Pipeline([('vectorizer', DictVectorizer(sparse=False)),
-                       ('classifier', DecisionTreeClassifier(criterion='entropy'))])
+classifier = Pipeline(
+    [
+        ("vectorizer", DictVectorizer(sparse=False)),
+        ("classifier", DecisionTreeClassifier(criterion="entropy")),
+    ]
+)
 classifier.fit(ALICE_X[:cutoff], ALICE_Y[:cutoff])
 
 x_test, y_test = transform_to_dataset(test_sentences)
 print("Accuracy:", classifier.score(x_test, y_test))
 
 
-'''
+"""
 tagged_tokens = tokenizers.tokenize_pos_tag(alice_txt, lang_code="pol")
 print("ALICE_TAGGED = {")
 for token_tag in tagged_tokens:
     print('    ', token_tag, ",", sep="")
 print("}")
-'''
+"""

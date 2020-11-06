@@ -24,9 +24,12 @@ class TranslationWord:
      - synonyms
      - native language
     """
+
     def __init__(self, word, pos, translator, lang=None):
         self.word = word
-        self.pos = set(pos) if type(pos) != str else {pos}  # Set of 1 or more parts of speech
+        self.pos = (
+            set(pos) if type(pos) != str else {pos}
+        )  # Set of 1 or more parts of speech
         self.translator = translator
         self.language = self.translator.language if lang is None else lang
         self.lemmas = self.lemmatize()
@@ -48,8 +51,11 @@ class TranslationWord:
             self.init_pos()
             if self.pos != prev_pos:
                 lemma = self.translator.lemmatize(self.word, self.pos, self.language)
-        lemmas = [lemma] if type(lemma) == str or len(lemma) == 0 \
+        lemmas = (
+            [lemma]
+            if type(lemma) == str or len(lemma) == 0
             else self.translator.ordered_set(lemma).items()
+        )
         for lemma in lemmas:
             self.init_pos(lemma)
         return lemmas
@@ -71,7 +77,9 @@ class TranslationWord:
         :return: None
         """
         word = self.word if word is None else word
-        if self.translator.language != "English" and not self.translator.is_nonalpha(word):
+        if self.translator.language != "English" and not self.translator.is_nonalpha(
+            word
+        ):
             pos = self.translator.word_poses(word, self.language)
             self.pos.update(pos)
 
@@ -119,41 +127,56 @@ class TranslationWord:
 
         :return: Image, image of this TW's Blissymbol
         """
-        return self.translator.trim(image=self.translator.word_image(self.word, subs=True))
+        return self.translator.trim(
+            image=self.translator.word_image(self.word, subs=True)
+        )
 
     def overlay_indicators(self, img):
         wikt_pos = self.translator.convert_pos_to_wikt(self.pos)
-        terms = self.translator.lang_parser.find_terms(self.word, wikt_pos, self.language, add_new=False)
-        if 'plural' in terms:
-            if 'singular' in terms:
+        terms = self.translator.lang_parser.find_terms(
+            self.word, wikt_pos, self.language, add_new=False
+        )
+        if "plural" in terms:
+            if "singular" in terms:
                 # if can be plural or singular, remove plural
-                if 'NNS' not in self.pos:
-                    terms.remove('plural')
+                if "NNS" not in self.pos:
+                    terms.remove("plural")
             else:
-                self.pos.add('NNS')
+                self.pos.add("NNS")
         if len(terms) != 0:
-            if len({'neutral', 'feminine', 'masculine'}.intersection(terms)) >= 2:
-                if 'neutral' in terms:
-                    terms.remove('neutral')
-                if 'feminine' in terms:
-                    terms.remove('feminine')
-                if 'masculine' in terms:
-                    terms.remove('masculine')
-            if len({'past', 'present', 'future'}.intersection(terms)) >= 2:
-                if 'past' in terms:
-                    terms.remove('past')
-                if 'present' in terms:
-                    terms.remove('present')
-                if 'future' in terms:
-                    terms.remove('future')
-            if len({'first-person', 'second-person', 'third-person'}.intersection(terms)) >= 2:
-                if 'first-person' in terms:
-                    terms.remove('first-person')
-                if 'second-person' in terms:
-                    terms.remove('second-person')
-                if 'third-person' in terms:
-                    terms.remove('third-person')
-            indicators = ["indicator_(" + INDICATORS_MAP[t] + ")" for t in terms if t in INDICATORS_MAP]
+            if len({"neutral", "feminine", "masculine"}.intersection(terms)) >= 2:
+                if "neutral" in terms:
+                    terms.remove("neutral")
+                if "feminine" in terms:
+                    terms.remove("feminine")
+                if "masculine" in terms:
+                    terms.remove("masculine")
+            if len({"past", "present", "future"}.intersection(terms)) >= 2:
+                if "past" in terms:
+                    terms.remove("past")
+                if "present" in terms:
+                    terms.remove("present")
+                if "future" in terms:
+                    terms.remove("future")
+            if (
+                len(
+                    {"first-person", "second-person", "third-person"}.intersection(
+                        terms
+                    )
+                )
+                >= 2
+            ):
+                if "first-person" in terms:
+                    terms.remove("first-person")
+                if "second-person" in terms:
+                    terms.remove("second-person")
+                if "third-person" in terms:
+                    terms.remove("third-person")
+            indicators = [
+                "indicator_(" + INDICATORS_MAP[t] + ")"
+                for t in terms
+                if t in INDICATORS_MAP
+            ]
             if len(indicators) != 0:
                 return self.blissymbol.overlay_indicators(img, indicators)
         return img
@@ -180,7 +203,9 @@ class TranslationWord:
         subtitle_h = self.translator.sub_heights()
 
         if subtitle.size[1] != subtitle_h:
-            subtitle_fill = self.translator.blank_image(subtitle.size[0], max(0, subtitle_h - subtitle.size[1]))
+            subtitle_fill = self.translator.blank_image(
+                subtitle.size[0], max(0, subtitle_h - subtitle.size[1])
+            )
             subtitle = self.translator.above(subtitle_fill, subtitle)
 
         img = self.translator.above(img, subtitle)
@@ -247,8 +272,11 @@ class TranslationWord:
         print("-" * len(eng_lemma))
 
         while keep_going:
-            print("Please enter the correct Blissymbol derivation(s) for " +
-                  eng_lemma + ", each separated by a comma and a space. ")
+            print(
+                "Please enter the correct Blissymbol derivation(s) for "
+                + eng_lemma
+                + ", each separated by a comma and a space. "
+            )
             user_deriv = str(input(""))
 
             if len(user_deriv) == 0:
@@ -270,12 +298,16 @@ class TranslationWord:
                     keep_going = keep_going or blissword is None
 
                     if keep_going:
-                        print("\nI'm sorry, one of the Blissymbol derivations you entered is invalid. " +
-                              "Please try using a different synonym.\n")
+                        print(
+                            "\nI'm sorry, one of the Blissymbol derivations you entered is invalid. "
+                            + "Please try using a different synonym.\n"
+                        )
                         continue
 
         derivation = self.words_to_derivation(derivations)
-        blissymbol = self.translator.blissymbol(eng_lemma, pos=self.pos, derivation=derivation)
+        blissymbol = self.translator.blissymbol(
+            eng_lemma, pos=self.pos, derivation=derivation
+        )
         self.reset_blissymbol(blissymbol)
         return self.blissymbol.derivations
 
@@ -339,29 +371,39 @@ class TranslationWord:
 
         :return: None
         """
-        blissymbol = self.translator.word_to_blissymbol(self.lemma, pos=self.pos, lang=self.language)
+        blissymbol = self.translator.word_to_blissymbol(
+            self.lemma, pos=self.pos, lang=self.language
+        )
 
         if blissymbol is not None:
             self.blissymbol = blissymbol
             return
 
         if len(self.lemmas) != 1:
-            blissymbol = self.translator.words_to_blissymbol(self.lemmas, pos=self.pos, lang=self.language)
+            blissymbol = self.translator.words_to_blissymbol(
+                self.lemmas, pos=self.pos, lang=self.language
+            )
             if blissymbol is None:
-                blissymbol = self.translator.words_to_blissymbol(self.lemmas, lang=self.language)
+                blissymbol = self.translator.words_to_blissymbol(
+                    self.lemmas, lang=self.language
+                )
             if blissymbol is not None:
                 self.blissymbol = blissymbol
                 return
 
         if self.word != self.lemma:
-            blissymbol = self.translator.word_to_blissymbol(self.word, pos=self.pos, lang=self.language)
+            blissymbol = self.translator.word_to_blissymbol(
+                self.word, pos=self.pos, lang=self.language
+            )
             if blissymbol is not None:
                 self.blissymbol = blissymbol
                 self.lemmas = [self.word] + self.lemmas
                 return
 
         if len(self.eng_lemmas) != 0:
-            blissymbol = self.translator.words_to_blissymbol(self.eng_lemmas, pos=self.pos)
+            blissymbol = self.translator.words_to_blissymbol(
+                self.eng_lemmas, pos=self.pos
+            )
             if blissymbol is not None:
                 self.blissymbol = blissymbol
                 return
@@ -404,10 +446,14 @@ class TranslationWord:
         :return: None
         """
         if self.blissymbol is None:
-            self.blissymbol = self.translator.words_to_blissymbol(self.eng_lemmas, "English", self.pos)
+            self.blissymbol = self.translator.words_to_blissymbol(
+                self.eng_lemmas, "English", self.pos
+            )
 
             if self.blissymbol is None:
-                self.blissymbol = self.translator.words_to_blissymbol(self.eng_lemmas, "English")
+                self.blissymbol = self.translator.words_to_blissymbol(
+                    self.eng_lemmas, "English"
+                )
 
             if self.blissymbol is None:
                 if machine_learn and self.translator.is_word(self.word):
@@ -454,7 +500,9 @@ class TranslationWord:
         if self.translator.in_bliss_dict(etym, self.language):
             return etym
         else:
-            etym_stemwords = self.translator.lang_parser.find_stemwords(etym, self.language)
+            etym_stemwords = self.translator.lang_parser.find_stemwords(
+                etym, self.language
+            )
 
             if len(etym_stemwords) == 0 and etym[0] == u"-":
                 clean_etym = etym[1:]
@@ -470,8 +518,14 @@ class TranslationWord:
         :return: None
         """
         print(self.language + u": " + self.lemma)
-        print("If the above is the true lemma for", self.word, ", press enter.\n",
-              "Otherwise, enter", self.word, "'s true lemma(s), separated by commas if necessary.")
+        print(
+            "If the above is the true lemma for",
+            self.word,
+            ", press enter.\n",
+            "Otherwise, enter",
+            self.word,
+            "'s true lemma(s), separated by commas if necessary.",
+        )
         ans = str(input(""))
 
         if ans != "":
@@ -502,11 +556,13 @@ class TranslationWord:
             translations = dict()
             translations["English"] = self.eng_lemmas
             translations[self.language] = [lemma]
-            blissymbol = self.translator.blissymbol(bliss_name=bliss_name,
-                                                    pos=self.pos,
-                                                    derivation=derivation,
-                                                    translations=translations,
-                                                    num=0)
+            blissymbol = self.translator.blissymbol(
+                bliss_name=bliss_name,
+                pos=self.pos,
+                derivation=derivation,
+                translations=translations,
+                num=0,
+            )
             blissymbol.add_synsets(self.synsets)
             self.reset_blissymbol(blissymbol)
             self.translator.add_bliss_entry(self.blissymbol)
@@ -525,7 +581,7 @@ class TranslationWord:
         :param pos: str or Iterable, word's Penn Treebank part(s) of speech
         :return: List[str], word's English translations
         """
-        '''
+        """
         synsets = self.translator.word_synsets(word, pos, self.translator.lang_code(self.language))
         # check synsets for English translations first
         if len(synsets) != 0:
@@ -535,7 +591,7 @@ class TranslationWord:
             eng_lemmas = eng_lemmas.intersections()  # most common lemmas
             if len(eng_lemmas) != 0:
                 return eng_lemmas
-        '''
+        """
         # if synsets provide no lemmas, check Wiktionary
         return self.translator.find_english_translations(word, pos, self.language)
 
@@ -560,11 +616,17 @@ class TranslationWord:
 
         :return: List[Synset], the word's synsets
         """
-        synsets = self.translator.words_synsets(self.lemmas, pos=self.pos, lang_code=self.translator.lang_code)
+        synsets = self.translator.words_synsets(
+            self.lemmas, pos=self.pos, lang_code=self.translator.lang_code
+        )
 
         if len(synsets) == 0 and self.language != "English":
-            synsets += self.translator.word_synsets(self.lemma, lang_code=self.translator.lang_code)
-            synsets += self.translator.words_synsets(self.eng_lemmas, pos=self.pos, lang_code="eng")
+            synsets += self.translator.word_synsets(
+                self.lemma, lang_code=self.translator.lang_code
+            )
+            synsets += self.translator.words_synsets(
+                self.eng_lemmas, pos=self.pos, lang_code="eng"
+            )
 
         return synsets
 
@@ -574,11 +636,22 @@ class TranslationWord:
 
         :return: str, string representation of this Blissymbol
         """
-        return "word:\t\t" + str(self.word) + "\n" + \
-               "pos:\t\t" + str(self.pos) + "\n" + \
-               "lemma:\t\t" + str(self.lemma) + "\n" + \
-               "eng lemmas:\t\t" + str("    ".join(self.eng_lemmas) if self.eng_lemmas is not None else "") + "\n" + \
-               "bliss:\t\t" + str(self.bliss_name) + "\n"
+        return (
+            "word:\t\t"
+            + str(self.word)
+            + "\n"
+            + "pos:\t\t"
+            + str(self.pos)
+            + "\n"
+            + "lemma:\t\t"
+            + str(self.lemma)
+            + "\n"
+            + "eng lemmas:\t\t"
+            + str("    ".join(self.eng_lemmas) if self.eng_lemmas is not None else "")
+            + "\n"
+            + "bliss:\t\t"
+            + str(self.bliss_name)
+            + "\n"
+        )
 
     __repr__ = __str__
-

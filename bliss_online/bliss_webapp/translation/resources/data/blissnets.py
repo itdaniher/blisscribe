@@ -8,6 +8,7 @@ BLISSNETS:
      - blissname to synset
 """
 import os, sys
+
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from .all_blissymbols import ALL_BLISSYMBOLS
 from .bci_blissnames import BCI_BLISSNAMES

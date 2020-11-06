@@ -11,7 +11,7 @@ def basic_bliss_translator(language, text):
     bt.translate(text, pos=PARTS_OF_SPEECH, fast=True, sub_all=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     language = input("What language is your translation in?\t")
     text = input("What would you like to translate?\t")
     basic_bliss_translator(language, text)

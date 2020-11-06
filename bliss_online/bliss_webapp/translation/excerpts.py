@@ -6,7 +6,8 @@ EXCERPTS:
 """
 import os
 import nltk
-nltk.download('gutenberg', quiet=True)
+
+nltk.download("gutenberg", quiet=True)
 from nltk.corpus import gutenberg
 
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -42,7 +43,7 @@ def parse_plaintext(filename):
     contents = []
     slash = "/" if filename[0] != "/" else ""
 
-    with open(FILE_PATH + slash + filename, "r", encoding='utf-8') as text:
+    with open(FILE_PATH + slash + filename, "r", encoding="utf-8") as text:
         for line in text:
             contents.append(line)
 
@@ -82,49 +83,53 @@ def write_plaintext(text, filename):
     """
     slash = "/" if filename[0] != "/" else ""
 
-    with open(FILE_PATH + slash + filename, mode="w+", encoding='utf-8') as out:
+    with open(FILE_PATH + slash + filename, mode="w+", encoding="utf-8") as out:
         out.write(text)
         out.close()
 
 
-sample_texts = ["/sample texts/adams-hitchhiker's_guide.txt",
-                "/sample texts/barrie-peter_pan.txt",
-                "/sample texts/carroll-alice_in_wonderland.txt",
-                "/sample texts/carroll-alice_in_wonderland_polish.txt",
-                "/sample texts/carroll-alice_in_wonderland_french.txt",
-                "/sample texts/carroll-alice_in_wonderland_spanish.txt",
-                "/sample texts/baum-wizard_of_oz.txt",
-                "/sample texts/conrad-heart_of_darkness.txt",
-                "/sample texts/dfw-infinite_jest.txt",
-                "/sample texts/exupery-little_prince.txt",
-                "/sample texts/exupery-little_prince_german.txt",
-                "/sample texts/exupery-little_prince_polish.txt",
-                "/sample texts/exupery-little_prince_russian.txt",
-                "/sample texts/exupery-little_prince_spanish.txt",
-                "/sample texts/exupery-petit_prince.txt",
-                "/sample texts/juster-phantom_tollbooth.txt",
-                "/sample texts/l'engle-wrinkle_in_time.txt",
-                "/sample texts/kafka-metamorphosis_english.txt",
-                "/sample texts/kafka-metamorphosis_german.txt",
-                "/sample texts/lewis-chronicles_of_narnia.txt",
-                "/sample texts/nabokov-lolita.txt",
-                "/sample texts/poe-raven.txt",
-                "/sample texts/pynchon-gravity's_rainbow.txt",
-                "/sample texts/sapowski-witcher_1_polish.txt",
-                "/sample texts/sapowski-witcher_2_polish.txt",
-                "/sample texts/tolkien-the_hobbit.txt",
-                "/sample texts/tolkien-lord_of_the_rings_1.txt",
-                "/sample texts/tolkien-lord_of_the_rings_2.txt",
-                "/sample texts/tolkien-lord_of_the_rings_3.txt",
-                "/sample texts/dosto-notes_from_underground.txt",
-                "/sample texts/dosto-notes_from_underground_russian.txt",
-                "/sample texts/rimbaud-saison_en_enfer.txt",
-                "/sample texts/frost-woods.txt",
-                "/sample texts/ievan_polkka.txt"]
+sample_texts = [
+    "/sample texts/adams-hitchhiker's_guide.txt",
+    "/sample texts/barrie-peter_pan.txt",
+    "/sample texts/carroll-alice_in_wonderland.txt",
+    "/sample texts/carroll-alice_in_wonderland_polish.txt",
+    "/sample texts/carroll-alice_in_wonderland_french.txt",
+    "/sample texts/carroll-alice_in_wonderland_spanish.txt",
+    "/sample texts/baum-wizard_of_oz.txt",
+    "/sample texts/conrad-heart_of_darkness.txt",
+    "/sample texts/dfw-infinite_jest.txt",
+    "/sample texts/exupery-little_prince.txt",
+    "/sample texts/exupery-little_prince_german.txt",
+    "/sample texts/exupery-little_prince_polish.txt",
+    "/sample texts/exupery-little_prince_russian.txt",
+    "/sample texts/exupery-little_prince_spanish.txt",
+    "/sample texts/exupery-petit_prince.txt",
+    "/sample texts/juster-phantom_tollbooth.txt",
+    "/sample texts/l'engle-wrinkle_in_time.txt",
+    "/sample texts/kafka-metamorphosis_english.txt",
+    "/sample texts/kafka-metamorphosis_german.txt",
+    "/sample texts/lewis-chronicles_of_narnia.txt",
+    "/sample texts/nabokov-lolita.txt",
+    "/sample texts/poe-raven.txt",
+    "/sample texts/pynchon-gravity's_rainbow.txt",
+    "/sample texts/sapowski-witcher_1_polish.txt",
+    "/sample texts/sapowski-witcher_2_polish.txt",
+    "/sample texts/tolkien-the_hobbit.txt",
+    "/sample texts/tolkien-lord_of_the_rings_1.txt",
+    "/sample texts/tolkien-lord_of_the_rings_2.txt",
+    "/sample texts/tolkien-lord_of_the_rings_3.txt",
+    "/sample texts/dosto-notes_from_underground.txt",
+    "/sample texts/dosto-notes_from_underground_russian.txt",
+    "/sample texts/rimbaud-saison_en_enfer.txt",
+    "/sample texts/frost-woods.txt",
+    "/sample texts/ievan_polkka.txt",
+]
 
 # remove Gutenberg header for analysis
-gutenberg_texts = {file_id[:-4].replace("-", " "): " ".join(gutenberg.words(file_id)).split("]", 1)[1]
-                   for file_id in gutenberg.fileids()}
+gutenberg_texts = {
+    file_id[:-4].replace("-", " "): " ".join(gutenberg.words(file_id)).split("]", 1)[1]
+    for file_id in gutenberg.fileids()
+}
 
 books = parse_excerpts(sample_texts)
 books.update(gutenberg_texts)
@@ -188,17 +193,37 @@ macbeth = books["shakespeare macbeth"]
 # Texts in specific languages
 shakespearean_texts = [hamlet, julius_caesar, macbeth]
 lord_of_the_rings = [hobbit, lotr1, lotr2, lotr3]
-multilingual_texts = {"eng": [alice_in_wonderland, little_prince, wizard_of_oz, peter_pan,
-                              phantom_tollbooth, wrinkle_in_time, chronicles_of_narnia,
-                              hitchhikers_guide, metamorphosis_english, heart_of_darkness,
-                              the_raven, blake_songs, frost_poem, leaves_of_grass, paradise_lost,
-                              hamlet, julius_caesar, macbeth, kjv] + lord_of_the_rings + list(gutenberg_texts.values()),
-                      "fin": [ievan_polkka],
-                      "fra": [alice_in_wonderland_french, petit_prince, saison_en_enfer],
-                      "deu": [metamorphosis_german, little_prince_german],
-                      "pol": [alice_in_wonderland_polish, little_prince_polish, witcher_1, witcher_2],
-                      "rus": [little_prince_russian, notes_from_underground_russian],
-                      "spa": [alice_in_wonderland_spanish, little_prince_spanish]}
+multilingual_texts = {
+    "eng": [
+        alice_in_wonderland,
+        little_prince,
+        wizard_of_oz,
+        peter_pan,
+        phantom_tollbooth,
+        wrinkle_in_time,
+        chronicles_of_narnia,
+        hitchhikers_guide,
+        metamorphosis_english,
+        heart_of_darkness,
+        the_raven,
+        blake_songs,
+        frost_poem,
+        leaves_of_grass,
+        paradise_lost,
+        hamlet,
+        julius_caesar,
+        macbeth,
+        kjv,
+    ]
+    + lord_of_the_rings
+    + list(gutenberg_texts.values()),
+    "fin": [ievan_polkka],
+    "fra": [alice_in_wonderland_french, petit_prince, saison_en_enfer],
+    "deu": [metamorphosis_german, little_prince_german],
+    "pol": [alice_in_wonderland_polish, little_prince_polish, witcher_1, witcher_2],
+    "rus": [little_prince_russian, notes_from_underground_russian],
+    "spa": [alice_in_wonderland_spanish, little_prince_spanish],
+}
 english_texts = multilingual_texts["eng"]
 finnish_texts = multilingual_texts["fin"]
 french_texts = multilingual_texts["fra"]
@@ -206,4 +231,3 @@ german_texts = multilingual_texts["deu"]
 polish_texts = multilingual_texts["pol"]
 russian_texts = multilingual_texts["rus"]
 spanish_texts = multilingual_texts["spa"]
-

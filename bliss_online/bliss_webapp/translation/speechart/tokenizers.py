@@ -57,7 +57,9 @@ def word_tokenize(text):
 
 def tokenize_pos_tag(phrase, lang_code="eng"):
     init_line_tokenizer()
-    phrase = ".\n".join(blankline_tokenize(phrase))  # add period to blank lines to simulate "sentences"
+    phrase = ".\n".join(
+        blankline_tokenize(phrase)
+    )  # add period to blank lines to simulate "sentences"
     sents = sent_tokenize(phrase)
     sents_tokens = [word_tokenize(s) for s in sents]
     sents_tags = pos_tag_sents(sents_tokens, lang=lang_code)
@@ -67,4 +69,3 @@ def tokenize_pos_tag(phrase, lang_code="eng"):
     for s in sents_tags:
         word_tags.extend(s)
     return word_tags
-

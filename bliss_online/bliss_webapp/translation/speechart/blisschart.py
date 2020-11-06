@@ -4,6 +4,7 @@ BLISSCHART:
     A module for representing semantics in graphs with Blissymbols.
 """
 import os, sys
+
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from bliss_online.bliss_webapp.translation.blisscribe import *
 from . import speecharts
@@ -21,6 +22,7 @@ class BlissChart(speecharts.LanguageChart):
     - Blissymbols are internally represented by 4-digit unicode IDs.
     - Graphs are visualized in Blissymbol characters.
     """
+
     def __init__(self, lang):
         speecharts.LanguageChart.__init__(self, lang)
         self.translator = BlissTranslator(lang)
@@ -69,7 +71,9 @@ class BlissChart(speecharts.LanguageChart):
         blissword = Blissymbol.PUNCT_MAP.get(punct, None)
 
         if blissword is not None:
-            blissymbol = self.translator.blissymbol(blissword, pos="WHITE", derivation="", num=None)
+            blissymbol = self.translator.blissymbol(
+                blissword, pos="WHITE", derivation="", num=None
+            )
             return blissymbol
         else:
             return
@@ -96,7 +100,9 @@ class BlissChart(speecharts.LanguageChart):
             blissymbol = self.punct_blissymbol(word)
         else:
             if pos is None:
-                pos = self.translator.convert_wikt_to_pos(self.word_poses(word, self.language))
+                pos = self.translator.convert_wikt_to_pos(
+                    self.word_poses(word, self.language)
+                )
             trans_word = self.translator.translation_word(word, pos, lang=self.language)
             blissymbol = trans_word.blissymbol
 
@@ -125,15 +131,15 @@ class BlissChart(speecharts.LanguageChart):
         blissymbols = list()
 
         for word in text:
-            #print "\nFINDING BLISSYMBOL FOR", word
+            # print "\nFINDING BLISSYMBOL FOR", word
             blissymbol = self.word_blissymbol(word)
-            #print("FOUND BLISSYMBOL.\n")
+            # print("FOUND BLISSYMBOL.\n")
 
             if blissymbol is not None:
                 if derivations:
                     blissymbols.extend(blissymbol.derivation_blissymbols())
                 else:
-                    #print word, blissymbol
+                    # print word, blissymbol
                     blissymbols.append(blissymbol)
             elif grammatical and not self.contains_punct(word):
                 break
@@ -174,7 +180,9 @@ class BlissChart(speecharts.LanguageChart):
         bliss_sentences = list()
 
         for sentence in sentences:
-            bliss_sentence = self.words_to_blissymbols(sentence, derivations, grammatical=True)
+            bliss_sentence = self.words_to_blissymbols(
+                sentence, derivations, grammatical=True
+            )
 
             if len(bliss_sentence) != 0:
                 self.add_start_label(bliss_sentence[0])
@@ -344,7 +352,10 @@ class BlissChart(speecharts.LanguageChart):
 
         if len(labels) != 0:
             print(labels)
-            return [", ".join([bliss.bliss_name for bliss in label]) for label in labels.values()]
+            return [
+                ", ".join([bliss.bliss_name for bliss in label])
+                for label in labels.values()
+            ]
         else:
             return list()
 
@@ -388,7 +399,9 @@ class BlissChart(speecharts.LanguageChart):
         :return: int, largest Blissymbol width
         """
         if len(self.transitions) != 0:
-            max_transition = max(self.transitions, key=lambda t: self.bliss_image(t[1]).size[0])
+            max_transition = max(
+                self.transitions, key=lambda t: self.bliss_image(t[1]).size[0]
+            )
             max_blissymbol = max_transition[1]
             max_width = self.bliss_image(max_blissymbol).size[0]
             return max_width * 2
@@ -428,11 +441,13 @@ class BlissChart(speecharts.LanguageChart):
                 inc, apex, angle = 0, 0, 0
 
             for i in range(num_arrows):
-                twig = self.connect_states(state0, state0, "", angle=angle, length=length, vertical=vertical)
+                twig = self.connect_states(
+                    state0, state0, "", angle=angle, length=length, vertical=vertical
+                )
                 if vertical:
                     branch = beside(branch, twig)
                 else:
-                    branch = above(branch, twig, align='left')
+                    branch = above(branch, twig, align="left")
                 angle -= inc
 
             img = self.connect_states(img, branch, length=0, vertical=vertical)
@@ -464,8 +479,10 @@ class BlissChart(speecharts.LanguageChart):
             for dest in sorted(destinations):
                 blissymbols = destinations[dest]
                 circ = self.visualize_state(dest, length)
-                twig = self.connect_states(state0, circ, blissymbols, angle=angle, length=length)
-                branch = above(branch, twig, align='left')
+                twig = self.connect_states(
+                    state0, circ, blissymbols, angle=angle, length=length
+                )
+                branch = above(branch, twig, align="left")
                 angle -= inc
 
             dfa = self.connect_states(dfa, branch, length=0)
@@ -480,7 +497,7 @@ class BlissChart(speecharts.LanguageChart):
         :param blissymbol: Blissymbol, Blissymbol to retrieve image for
         :return: Image, image for Blissymbol
         """
-        max_height = self.bliss_height/2 if mini else self.bliss_height
+        max_height = self.bliss_height / 2 if mini else self.bliss_height
         return blissymbol.image(max_height=max_height)
 
     def empty_bliss_image(self):
@@ -489,7 +506,7 @@ class BlissChart(speecharts.LanguageChart):
 
         :return: Image, empty image for Blissymbols
         """
-        return rectangle(0, int(self.bliss_height/2.0), fill=None)
+        return rectangle(0, int(self.bliss_height / 2.0), fill=None)
 
     def state_arrow(self, length, angle, bliss_transitions, vertical=False):
         """
@@ -503,8 +520,16 @@ class BlissChart(speecharts.LanguageChart):
         """
         width = 2 if vertical else length
         height = length if vertical else 2
-        bliss_arro = arrow(width=width, height=height, fill="lightgray",
-                     angle=angle, label="", font_size=self.FONT_SIZE, lang=self.chart_lang, font=self.font)
+        bliss_arro = arrow(
+            width=width,
+            height=height,
+            fill="lightgray",
+            angle=angle,
+            label="",
+            font_size=self.FONT_SIZE,
+            lang=self.chart_lang,
+            font=self.font,
+        )
 
         if len(bliss_transitions) != 0:
             transitions = sorted(bliss_transitions)
@@ -543,9 +568,13 @@ class BlissChart(speecharts.LanguageChart):
         for i in range(len(blissymbols)):
             while True:
                 blissymbol = blissymbols[i]
-                next_bliss = blissymbols[i+1] if i+1 < len(blissymbols) else None
+                next_bliss = blissymbols[i + 1] if i + 1 < len(blissymbols) else None
                 is_punct = blissymbol.is_punct()
-                is_end = False if next_bliss is None else next_bliss.bliss_name[:7] == "period"
+                is_end = (
+                    False
+                    if next_bliss is None
+                    else next_bliss.bliss_name[:7] == "period"
+                )
 
                 if not is_punct:
                     curr_state = self.transition(curr_state, blissymbol)
@@ -565,4 +594,3 @@ class BlissChart(speecharts.LanguageChart):
                 break  # break if no continue up until end
 
         return curr_state
-
