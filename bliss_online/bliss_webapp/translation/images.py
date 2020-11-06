@@ -145,10 +145,10 @@ def word_image(word, img_h, **kwargs):
             font = make_font(font_path, font_size)
         img = blank_image(font.getsize(word)[0], img_h)
         sketch = ImageDraw.Draw(img)
-        sketch.text((0, int(font.size*0.75)),
-                    word,
-                    fill="black",
-                    font=font)
+        sketch.text((0, int(font.getsize(word)[0]*0.75)),
+                    text = word,
+                    font=font,
+                    fill="black")
         return trim_horizontal(img)
 
 

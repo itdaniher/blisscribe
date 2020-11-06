@@ -493,7 +493,7 @@ class BlissTranslator:
 
             os.remove(filename)  # deletes images once in PDF
 
-        pdf.output(PATH + "/out/" + title + ".pdf", "F")
+        pdf.output(PATH + "/out/" + "translation" + ".pdf", "F")
         return pdf
 
     def delete_pdf(self, filename):

@@ -74,7 +74,7 @@ def downloadPdf(request):
                                             page_nums=page_nums,
                                             fast_translate=fast_translate)
         translator.translate()
-        filename = title + ".pdf"
+        filename = "translation.pdf"
 
         with open(path + filename, "rb") as pdf:
             response = HttpResponse(FileWrapper(pdf), content_type='application/pdf')
