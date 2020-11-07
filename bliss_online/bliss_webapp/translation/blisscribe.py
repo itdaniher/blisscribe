@@ -2064,8 +2064,9 @@ class BlissTranslator:
         imgs = []
 
         for trans_word in trans_words:
+            print("word", trans_word)
             if type(trans_word) == str:
-                if trans_word == "\n":
+                if trans_word in ["\n", '!', '.', '?', '!.']:
                     imgs.append(None)
                 else:
                     imgs.append(self.word_image(trans_word))
@@ -2101,7 +2102,7 @@ class BlissTranslator:
                 # start new paragraph
                 add_line(line)
                 line = new_line()
-                x = indent
+                x = 0
             else:
                 # continue on current line until...
                 if inc_x(image) > w:

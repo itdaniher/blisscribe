@@ -16,5 +16,10 @@ requests = "*"
 lxml = "*"
 black = {git = "https://github.com/psf/black"}
 
+[scripts]
+server = "pipenv run python bliss_online/manage.py runserver"
+makemigrations = "pipenv run python bliss_online/manage.py makemigrations"
+migrate = "pipenv run python bliss_online/manage.py migrate"
+
 [requires]
 python_version = "3.8"
